@@ -14,7 +14,12 @@ cargo xtask ci      # fmt --check, clippy -D warnings, test, kiểm tra ranh gi�
 cargo xtask deps    # chỉ kiểm tra ranh giới crate
 cargo xtask fmt     # tự định dạng code
 cargo test -p <crate>
+cargo run -p cli -- check                          # kiểm tra thư mục content/
+cargo run -p cli -- replay <hoạt-động> <dấu-vết.json>  # phát lại + chấm, in JSON
+UPDATE_SNAPSHOTS=1 cargo test -p cli               # cập nhật snapshot CÓ CHỦ ĐÍCH (giải thích trong mô tả thay đổi)
 ```
+
+Snapshot ở `crates/cli/tests/traces/` giữ định dạng dấu vết `format = 1` đọc được mãi. Snapshot đổi mà không giải thích được = lỗi, không phải "cập nhật cho qua".
 
 Không báo "xong" khi chưa chạy `cargo xtask ci` và thấy nó qua. Nếu nó đỏ, báo nguyên văn lỗi.
 

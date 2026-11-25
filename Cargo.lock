@@ -5,6 +5,13 @@ version = 4
 [[package]]
 name = "cli"
 version = "0.0.0"
+dependencies = [
+ "content",
+ "diagnose",
+ "manip",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "content"

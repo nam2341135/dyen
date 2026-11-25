@@ -1,0 +1,38 @@
+{
+  "activity": "frac-compare-third-fifth",
+  "model": "bars",
+  "format": 1,
+  "steps": 1,
+  "final_state": {
+    "freehand": false,
+    "partitions": [
+      3,
+      5
+    ],
+    "bars": [
+      {
+        "marks": [],
+        "cuts": []
+      },
+      {
+        "marks": [],
+        "cuts": []
+      }
+    ],
+    "ruler": []
+  },
+  "assessment": {
+    "score": 1000,
+    "solved": true,
+    "observations": [
+      {
+        "concept": "frac.compare-same-numerator",
+        "finding": "demonstrated",
+        "confidence": "tentative",
+        "evidence": [
+          0
+        ]
+      }
+    ]
+  }
+}

@@ -14,6 +14,7 @@ publish = false
 domain = { path = "crates/domain" }
 manip = { path = "crates/manip" }
 diagnose = { path = "crates/diagnose" }
+content = { path = "crates/content" }
 # Bên ngoài (crate thuần chỉ được dùng serde, thiserror — ADR 0006)
 serde = { version = "1", features = ["derive"] }
 thiserror = "2"

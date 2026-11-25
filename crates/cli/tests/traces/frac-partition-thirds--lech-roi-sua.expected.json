@@ -1,0 +1,37 @@
+{
+  "activity": "frac-partition-thirds",
+  "model": "bars",
+  "format": 1,
+  "steps": 7,
+  "final_state": {
+    "freehand": true,
+    "partitions": [],
+    "bars": [
+      {
+        "marks": [],
+        "cuts": [
+          285,
+          560
+        ]
+      }
+    ],
+    "ruler": []
+  },
+  "assessment": {
+    "score": 1000,
+    "solved": true,
+    "observations": [
+      {
+        "concept": "frac.equal-parts",
+        "finding": {
+          "self_corrected": "frac.unequal-parts"
+        },
+        "confidence": "tentative",
+        "evidence": [
+          1,
+          5
+        ]
+      }
+    ]
+  }
+}

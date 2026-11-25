@@ -195,13 +195,15 @@ fn assess_compare(left: Fraction, right: Fraction, trace: &Trace<bars::Action>) 
             _ => None,
         })
         .collect();
-    let first_ok = answers.first().is_some_and(|(_, r)| *r == correct);
     let last = answers.last().copied();
     let solved = last.is_some_and(|(_, r)| r == correct);
-    let score = match (first_ok, solved) {
-        (true, _) => Score::FULL,
-        (false, true) => Score::from_permille(500).unwrap_or(Score::ZERO),
-        (false, false) => Score::ZERO,
+    // Điểm theo câu trả lời cuối: chưa đúng → 0; đúng và chưa từng sai → đủ điểm;
+    // đúng sau khi đã sai → một nửa. (Đúng rồi đổi sang sai vẫn là 0.)
+    let never_wrong = answers.iter().all(|(_, r)| *r == correct);
+    let score = match (solved, never_wrong) {
+        (false, _) => Score::ZERO,
+        (true, true) => Score::FULL,
+        (true, false) => Score::from_permille(500).unwrap_or(Score::ZERO),
     };
 
     let mut observations = Vec::new();
@@ -388,6 +390,14 @@ mod tests {
             Finding::Misconception(misconception(ids::LARGER_DENOMINATOR_LARGER))
         );
         assert_eq!(o.confidence, Confidence::Strong);
+    }
+
+    #[test]
+    fn dung_roi_doi_sang_sai_la_chua_dat() {
+        let t = trace(vec![answer(Relation::Greater), answer(Relation::Less)]);
+        let a = assess_bars(&compare(), &setup(false), &t).unwrap();
+        assert!(!a.solved);
+        assert_eq!(a.score, Score::ZERO);
     }
 
     #[test]

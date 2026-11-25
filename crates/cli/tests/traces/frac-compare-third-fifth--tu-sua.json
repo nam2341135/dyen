@@ -1,0 +1,10 @@
+{"format":1,"entries":[
+  {"at_ms":3100,"actor":"learner","step":{"answer":{"compare":"less"}}},
+  {"at_ms":6000,"actor":"learner","step":{"model":{"op":"partition","bar":0,"parts":3}}},
+  {"at_ms":7400,"actor":"learner","step":{"model":{"op":"partition","bar":1,"parts":5}}},
+  {"at_ms":9000,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":280}}},
+  {"at_ms":10500,"actor":"learner","step":{"model":{"op":"cut","bar":1,"at":168}}},
+  {"at_ms":12000,"actor":"learner","step":{"model":{"op":"place","piece":{"bar":0,"start":0}}}},
+  {"at_ms":13300,"actor":"learner","step":{"model":{"op":"place","piece":{"bar":1,"start":0}}}},
+  {"at_ms":16800,"actor":"learner","step":{"answer":{"compare":"greater"}}}
+]}

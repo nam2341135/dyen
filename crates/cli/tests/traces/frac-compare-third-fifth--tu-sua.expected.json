@@ -1,0 +1,62 @@
+{
+  "activity": "frac-compare-third-fifth",
+  "model": "bars",
+  "format": 1,
+  "steps": 8,
+  "final_state": {
+    "freehand": false,
+    "partitions": [
+      3,
+      5
+    ],
+    "bars": [
+      {
+        "marks": [
+          280,
+          560
+        ],
+        "cuts": [
+          280
+        ]
+      },
+      {
+        "marks": [
+          168,
+          336,
+          504,
+          672
+        ],
+        "cuts": [
+          168
+        ]
+      }
+    ],
+    "ruler": [
+      {
+        "bar": 0,
+        "start": 0
+      },
+      {
+        "bar": 1,
+        "start": 0
+      }
+    ]
+  },
+  "assessment": {
+    "score": 500,
+    "solved": true,
+    "observations": [
+      {
+        "concept": "frac.compare-same-numerator",
+        "finding": {
+          "self_corrected": "frac.larger-denominator-larger"
+        },
+        "confidence": "tentative",
+        "evidence": [
+          0,
+          7
+        ]
+      }
+    ]
+  }
+}
