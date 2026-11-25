@@ -37,7 +37,7 @@ Chứa số học và hình học chính xác:
 
 | Thành phần | Nội dung |
 |---|---|
-| `Rational` | Số hữu tỉ có dấu, tử và mẫu `i64`, luôn tối giản, mẫu > 0. Phép tính trung gian dùng `i128`. **Mọi phép tính đều `checked`** và trả `Result<_, Overflow>`, không panic, không tràn lặng lẽ. Serde dạng chuỗi `"-3/4"` (giống `Fraction` của `kind-bars`). |
+| `Rational` | Số hữu tỉ có dấu, tử và mẫu `i64`, luôn tối giản, mẫu > 0. Phép tính trung gian dùng `i128`. **Mọi phép tính đều `checked`** và trả `Result<_, ExactError>` (`Overflow` hoặc `DivisionByZero`), không panic, không tràn lặng lẽ. Serde dạng chuỗi `"-3/4"` (giống `Fraction` của `kind-bars`). |
 | `Vec3`, `Point3` | Tọa độ `Rational`. Có cộng, trừ, tích vô hướng, tích có hướng. |
 | `Line3`, `Plane`, `Segment3` | Mặt phẳng qua 3 điểm, giao đường với mặt, giao mặt với mặt, điểm nằm trên mặt, cùng phía hay khác phía. |
 | Khoảng cách và góc | Không lấy căn: trả về **bình phương độ dài** (`Rational`) và **cos² của góc kèm dấu**. Mọi so sánh "dài hơn", "góc lớn hơn", "vuông góc" đều chính xác trên các số này. |
@@ -51,6 +51,7 @@ Chứa số học và hình học chính xác:
 ### 3. Thời điểm làm
 
 - **Không tạo `lib-exact` ngay khi chấp nhận ADR này.** Tạo nó cùng lúc với loại hình học đầu tiên (dự kiến `kind-section`), để API được định hình bởi một ca dùng thật.
+- **Đã làm (2026-11-26):** `lib-exact` được tạo cùng `kind-section`, chỉ gồm `Rational`, `Vec3` (dùng cho cả điểm), `Plane` (qua 3 điểm, xét phía, giao với đoạn). `Line3`, `Segment3`, giao mặt–mặt, khoảng cách, góc và `Surd` để dành cho loại hoạt động cần đến chúng.
 - `kind-bars` chuyển từ `Fraction` sang `lib_exact::Rational` sau đó, khi tiện, **với điều kiện snapshot dấu vết không đổi** (serde vẫn là `"1/3"`). Không bắt buộc.
 
 ## Hệ quả

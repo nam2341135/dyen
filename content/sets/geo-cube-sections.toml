@@ -1,0 +1,3 @@
+id = "geo-cube-sections"
+title = "Thiết diện của hình lập phương"
+activities = ["geo-cube-section-hexagon"]

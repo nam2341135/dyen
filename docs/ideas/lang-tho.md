@@ -43,6 +43,7 @@ Toán vừa là **cách chơi**, vừa xen các bài **kiểu đề thi** để 
 Mỗi loại dưới đây là một crate riêng, không biết gì về làng. Làng chỉ là lớp bọc bên ngoài.
 
 1. **`section`: thiết diện.** Học sinh chọn 3 điểm trên cạnh hoặc mặt của một khối (lập phương, chóp, lăng trụ), dự đoán hình thiết diện, rồi cắt để kiểm tra.
+   - **Đã có bản đầu:** `crates/kinds/section`, chỉ hình lập phương, 3 điểm trên cạnh; người học đánh dấu vị trí các đỉnh thiết diện rồi cắt.
    - Đầu vào: `pick_point`, `predict{shape}`, `cut`.
    - Phát hiện có thể có: chỉ nối các điểm cùng mặt nhưng quên giao tuyến; nghĩ thiết diện luôn là tam giác hoặc tứ giác.
 2. **`net`: khai triển.** Gấp hoặc trải một lưới thành khối, chọn lưới nào gấp được thành khối nào.
@@ -72,7 +73,7 @@ Mỗi loại dưới đây là một crate riêng, không biết gì về làng.
 
 Đây là phần giá trị nhất của bản nháp. Mỗi mục dưới đây sẽ cần một ADR trước khi xây.
 
-1. **Toán chính xác dùng chung** — đề xuất ở [ADR 0012](../adr/0012-toan-chinh-xac.md). `section`, `measure`, `build`, `short-answer` đều cần số hữu tỉ, vectơ 3D hữu tỉ, căn dạng `a√b`, mặt phẳng và giao tuyến. Hiện ADR 0006 cấm `kind-*` phụ thuộc lẫn nhau, còn `kind-bars` thì tự viết `Fraction` riêng. Cần cho phép một tầng crate **tiện ích thuần** (ví dụ `exact`) nằm giữa `kernel` và `kind-*`. Nếu không, mỗi loại sẽ tự viết lại phần hình học.
+1. **Toán chính xác dùng chung** — đã chấp nhận ở [ADR 0012](../adr/0012-toan-chinh-xac.md); `crates/libs/exact` có `Rational`, `Vec3`, `Plane`. `section`, `measure`, `build`, `short-answer` đều cần số hữu tỉ, vectơ 3D hữu tỉ, căn dạng `a√b`, mặt phẳng và giao tuyến. Hiện ADR 0006 cấm `kind-*` phụ thuộc lẫn nhau, còn `kind-bars` thì tự viết `Fraction` riêng. Cần cho phép một tầng crate **tiện ích thuần** (ví dụ `exact`) nằm giữa `kernel` và `kind-*`. Nếu không, mỗi loại sẽ tự viết lại phần hình học.
 2. **Tiến độ qua nhiều hoạt động.** Hiện lõi chỉ biết một hoạt động với một dấu vết. Làng cần "trạng thái hành trình": đã dựng gì, mở khóa gì, kỹ năng nào sắp quên. Trạng thái này nên được **suy ra từ các `Outcome`** và tất định (tinh thần ADR 0003), đặt ở một tầng mới trên `registry`. Lõi không được biết "làng".
 3. **Thời gian trong ôn lặp.** Muốn lên lịch "sắp quên" thì phải biết thời gian, mà crate thuần không được đọc đồng hồ. Thời gian phải được truyền vào như dữ liệu, ví dụ ngày của từng phiên.
 4. **Hợp đồng bộ hiển thị.** Mỗi `kind-*` cần một phần vẽ 3D riêng, và cảnh làng phải chứa được cảnh của hoạt động bên trong. Điều này cần một "sổ đăng ký bộ hiển thị" song song với `registry`, và gắn với ADR 0008 (đang chờ đo trên điện thoại).

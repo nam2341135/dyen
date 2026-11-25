@@ -37,3 +37,4 @@ Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, 
 | 4 | Tái cấu trúc lõi trung lập (ADR 0010): `kernel`, `kind-bars`, `registry` | Xong |
 | — | Spike Leptos + Bevy (chốt ADR 0008) | Đang làm — còn đo trên điện thoại |
 | — | Loại hoạt động thứ hai `kind-choice` (kiểm chứng ADR 0010; sinh ra ADR 0011) | Xong |
+| — | Loại hình học đầu tiên `kind-section` (thiết diện lập phương) cùng `lib-exact` (kiểm chứng ADR 0012) | Xong |

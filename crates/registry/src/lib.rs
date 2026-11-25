@@ -11,6 +11,7 @@
 use kernel::{ConfigError, Kind, Outcome, ReplayError, TagId, Trace};
 use kind_bars::Bars;
 use kind_choice::Choice;
+use kind_section::Section;
 use serde::{Deserialize, Deserializer, Serialize};
 
 /// Cấu hình của mọi loại hoạt động. TOML: bảng `[config]` với `kind = "<tên loại>"`.
@@ -21,6 +22,8 @@ pub enum AnyConfig {
     Bars(kind_bars::Config),
     /// Chọn một hoặc nhiều đáp án.
     Choice(kind_choice::Config),
+    /// Thiết diện của hình lập phương.
+    Section(kind_section::Config),
 }
 
 /// Trạng thái của mọi loại hoạt động (chỉ để báo cáo; JSON không mang tên loại).
@@ -31,10 +34,12 @@ pub enum AnyState {
     Bars(kind_bars::State),
     /// Trạng thái chọn đáp án.
     Choice(kind_choice::State),
+    /// Trạng thái thiết diện.
+    Section(kind_section::State),
 }
 
 /// Tên mọi loại hoạt động đã đăng ký.
-pub const KINDS: &[&str] = &[Bars::KIND, Choice::KIND];
+pub const KINDS: &[&str] = &[Bars::KIND, Choice::KIND, Section::KIND];
 
 impl AnyConfig {
     /// Tên loại hoạt động.
@@ -42,6 +47,7 @@ impl AnyConfig {
         match self {
             Self::Bars(_) => Bars::KIND,
             Self::Choice(_) => Choice::KIND,
+            Self::Section(_) => Section::KIND,
         }
     }
 
@@ -50,6 +56,7 @@ impl AnyConfig {
         match self {
             Self::Bars(_) => Bars::TAGS,
             Self::Choice(_) => Choice::TAGS,
+            Self::Section(_) => Section::TAGS,
         }
     }
 
@@ -58,6 +65,7 @@ impl AnyConfig {
         match self {
             Self::Bars(c) => Bars::config_tags(c),
             Self::Choice(c) => Choice::config_tags(c),
+            Self::Section(c) => Section::config_tags(c),
         }
     }
 
@@ -66,6 +74,7 @@ impl AnyConfig {
         match self {
             Self::Bars(c) => Bars::init(c).map(|_| ()),
             Self::Choice(c) => Choice::init(c).map(|_| ()),
+            Self::Section(c) => Section::init(c).map(|_| ()),
         }
     }
 }
@@ -73,7 +82,7 @@ impl AnyConfig {
 /// Mọi nhãn cố định (`Kind::TAGS`) của mọi loại hoạt động, sắp xếp, không trùng.
 /// Nhãn từ cấu hình xem [`AnyConfig::config_tags`].
 pub fn all_tags() -> Vec<&'static str> {
-    let mut tags: Vec<&'static str> = [Bars::TAGS, Choice::TAGS].concat();
+    let mut tags: Vec<&'static str> = [Bars::TAGS, Choice::TAGS, Section::TAGS].concat();
     tags.sort_unstable();
     tags.dedup();
     tags
@@ -110,6 +119,7 @@ pub fn run<'de, D: Deserializer<'de>>(config: &AnyConfig, trace: D) -> Result<Ru
     match config {
         AnyConfig::Bars(c) => run_kind::<Bars, D>(c, trace, AnyState::Bars),
         AnyConfig::Choice(c) => run_kind::<Choice, D>(c, trace, AnyState::Choice),
+        AnyConfig::Section(c) => run_kind::<Section, D>(c, trace, AnyState::Section),
     }
 }
 
@@ -166,7 +176,7 @@ right = "1/5"
         let tags = all_tags();
         assert!(tags.windows(2).all(|w| w[0] < w[1]));
         assert!(tags.contains(&kind_bars::tags::EQUAL_PARTS));
-        assert_eq!(KINDS, &["bars", "choice"]);
+        assert_eq!(KINDS, &["bars", "choice", "section"]);
     }
 
     #[test]
@@ -225,5 +235,36 @@ tag = "frac.larger-denominator-larger"
         assert!(run.outcome.completed);
         assert_eq!(run.outcome.score.permille(), 500);
         assert_eq!(run.outcome.findings.len(), 1);
+    }
+
+    const SECTION: &str = r#"
+kind = "section"
+points = [
+  { edge = "bc", at = "1/2" },
+  { edge = "cd", at = "1/2" },
+  { edge = "a1b1", at = "1/2" },
+]
+"#;
+
+    #[test]
+    fn loai_thiet_dien() {
+        let c: AnyConfig = toml::from_str(SECTION).unwrap();
+        assert_eq!(c.kind(), "section");
+        assert!(c.validate().is_ok());
+        assert_eq!(c.tags(), kind_section::Section::TAGS);
+        assert!(c.config_tags().is_empty());
+
+        let json = r#"{"format":1,"entries":[
+            {"at_ms":0,"actor":"learner","input":{"op":"mark","site":"bc"}},
+            {"at_ms":1,"actor":"learner","input":{"op":"mark","site":"cd"}},
+            {"at_ms":2,"actor":"learner","input":{"op":"mark","site":"a1b1"}},
+            {"at_ms":3,"actor":"learner","input":{"op":"cut"}}]}"#;
+        let run = run(&c, &mut serde_json::Deserializer::from_str(json)).unwrap();
+        assert_eq!(run.kind, "section");
+        assert!(!run.outcome.completed);
+        assert_eq!(
+            run.outcome.findings[0].tag.as_str(),
+            "geo.section-only-given"
+        );
     }
 }

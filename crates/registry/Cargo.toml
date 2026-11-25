@@ -11,6 +11,7 @@ publish.workspace = true
 kernel.workspace = true
 kind-bars.workspace = true
 kind-choice.workspace = true
+kind-section.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 

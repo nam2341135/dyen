@@ -341,6 +341,14 @@ title = "Chia đủ số phần nhưng không bằng nhau"
 [[tag]]
 id = "frac.larger-denominator-larger"
 title = "Mẫu lớn hơn thì lớn hơn"
+
+[[tag]]
+id = "geo.section-only-given"
+title = "Chỉ nối điểm đề cho"
+
+[[tag]]
+id = "geo.section-off-plane"
+title = "Vị trí ngoài mặt cắt"
 "#;
 
     const ACTIVITY: &str = r#"
@@ -382,7 +390,7 @@ right = "1/5"
     #[test]
     fn hop_le() {
         let lib = Library::from_sources(&sources()).unwrap();
-        assert_eq!(lib.tags().len(), 4);
+        assert_eq!(lib.tags().len(), 6);
         assert_eq!(lib.activities().len(), 1);
         assert_eq!(lib.sets().len(), 1);
         let a = lib.activities().values().next().unwrap();

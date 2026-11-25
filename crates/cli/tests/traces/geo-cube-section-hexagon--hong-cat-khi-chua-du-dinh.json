@@ -1,0 +1,5 @@
+{"format":1,"entries":[
+  {"at_ms":2000,"actor":"learner","input":{"op":"mark","site":"bc"}},
+  {"at_ms":3000,"actor":"learner","input":{"op":"mark","site":"cd"}},
+  {"at_ms":4000,"actor":"learner","input":{"op":"cut"}}
+]}

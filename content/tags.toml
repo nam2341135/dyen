@@ -18,3 +18,11 @@ title = "Chia đủ số phần nhưng các phần không bằng nhau"
 [[tag]]
 id = "frac.larger-denominator-larger"
 title = "Nghĩ mẫu số lớn hơn thì phân số lớn hơn"
+
+[[tag]]
+id = "geo.section-only-given"
+title = "Thiết diện: chỉ nối các điểm đề cho, quên tìm giao tuyến với các mặt khác"
+
+[[tag]]
+id = "geo.section-off-plane"
+title = "Thiết diện: chọn một vị trí mà mặt phẳng cắt không đi qua"

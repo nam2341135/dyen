@@ -1,0 +1,9 @@
+{"format":1,"entries":[
+  {"at_ms":3000,"actor":"learner","input":{"op":"mark","site":"bc"}},
+  {"at_ms":4100,"actor":"learner","input":{"op":"mark","site":"cd"}},
+  {"at_ms":5200,"actor":"learner","input":{"op":"mark","site":"a1b1"}},
+  {"at_ms":9000,"actor":"learner","input":{"op":"mark","site":"bb1"}},
+  {"at_ms":11000,"actor":"learner","input":{"op":"mark","site":"dd1"}},
+  {"at_ms":14500,"actor":"learner","input":{"op":"mark","site":"d1a1"}},
+  {"at_ms":16000,"actor":"learner","input":{"op":"cut"}}
+]}

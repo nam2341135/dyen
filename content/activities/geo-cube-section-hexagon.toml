@@ -1,0 +1,13 @@
+id = "geo-cube-section-hexagon"
+title = "Thiết diện lục giác của hình lập phương"
+prompt = "Cho hình lập phương ABCD.A'B'C'D'. Gọi M, N, P lần lượt là trung điểm của BC, CD, A'B'. Đánh dấu mọi vị trí có đỉnh của thiết diện tạo bởi mặt phẳng (MNP), rồi cắt."
+tags = ["geo.section-only-given"]
+
+[config]
+kind = "section"
+attempts = 3
+points = [
+  { edge = "bc", at = "1/2" },
+  { edge = "cd", at = "1/2" },
+  { edge = "a1b1", at = "1/2" },
+]

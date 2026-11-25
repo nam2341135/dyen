@@ -1,0 +1,106 @@
+{
+  "activity": "geo-cube-section-hexagon",
+  "kind": "section",
+  "format": 1,
+  "steps": 8,
+  "final_state": {
+    "attempts": 3,
+    "points": [
+      {
+        "x": "1",
+        "y": "1/2",
+        "z": "0"
+      },
+      {
+        "x": "1/2",
+        "y": "1",
+        "z": "0"
+      },
+      {
+        "x": "1/2",
+        "y": "0",
+        "z": "1"
+      }
+    ],
+    "given_sites": [
+      "bc",
+      "cd",
+      "a1b1"
+    ],
+    "section": [
+      {
+        "site": "bc",
+        "point": {
+          "x": "1",
+          "y": "1/2",
+          "z": "0"
+        }
+      },
+      {
+        "site": "cd",
+        "point": {
+          "x": "1/2",
+          "y": "1",
+          "z": "0"
+        }
+      },
+      {
+        "site": "a1b1",
+        "point": {
+          "x": "1/2",
+          "y": "0",
+          "z": "1"
+        }
+      },
+      {
+        "site": "d1a1",
+        "point": {
+          "x": "0",
+          "y": "1/2",
+          "z": "1"
+        }
+      },
+      {
+        "site": "bb1",
+        "point": {
+          "x": "1",
+          "y": "0",
+          "z": "1/2"
+        }
+      },
+      {
+        "site": "dd1",
+        "point": {
+          "x": "0",
+          "y": "1",
+          "z": "1/2"
+        }
+      }
+    ],
+    "marked": [
+      "bc",
+      "cd",
+      "a1b1",
+      "d1a1",
+      "bb1",
+      "dd1"
+    ],
+    "cuts": 2,
+    "solved": true
+  },
+  "outcome": {
+    "score": 500,
+    "completed": true,
+    "findings": [
+      {
+        "tag": "geo.section-only-given",
+        "recovered": true,
+        "confidence": "tentative",
+        "evidence": [
+          3,
+          7
+        ]
+      }
+    ]
+  }
+}
