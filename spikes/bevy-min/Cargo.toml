@@ -1,0 +1,40 @@
+[package]
+name = "spike-bevy-min"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Spike — ngoài workspace chính (spikes/README.md).
+[workspace]
+
+[dependencies]
+bevy = { version = "=0.20.1", default-features = false, features = [
+    "std",
+    "async_executor",
+    "bevy_asset",
+    "bevy_log",
+    "bevy_winit",
+    "bevy_window",
+    "webgl2",
+    "web",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_pbr",
+    "bevy_light",
+    "bevy_camera",
+    "bevy_mesh",
+    "bevy_material",
+    "bevy_shader",
+    "bevy_color",
+    "bevy_picking",
+    "mesh_picking",
+    "mouse",
+    "touch",
+] }
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false # wasm-opt bỏ tên; giữ section target_features cho wasm-bindgen

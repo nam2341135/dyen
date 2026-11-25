@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>spike leptos-bevy</title>
+<style>
+  body{font-family:system-ui,sans-serif;margin:1rem}
+  #wrap3d{width:600px;height:360px;display:none;border:1px solid #999}
+  #bevy{width:100%;height:100%;display:block}
+  #timing{color:#555;font-size:.9em}
+</style>
+<div id="wrap3d"><canvas id="bevy"></canvas></div>
+<p id="timing"></p>
+<script type="module">
+  const timing = document.getElementById("timing");
+  const log = (s) => { console.log(s); timing.textContent += s + " · "; };
+  const tPage = performance.now();
+
+  // Cầu nối vỏ ↔ 3D. Vỏ (Leptos) gọi dyen3d.show/hide; Bevy gọi dyenEmit/dyenFirstFrame.
+  let t3d = 0;
+  window.dyenFirstFrame = () => log(`3D: khung đầu sau ${Math.round(performance.now() - t3d)} ms kể từ lúc bật`);
+  window.dyenEmit = (json) => window.dyenShellInput?.(json);
+  window.dyen3d = {
+    mod: null,
+    loading: null,
+    async show(json) {
+      document.getElementById("wrap3d").style.display = "block";
+      if (!this.mod) {
+        this.loading ??= (async () => {
+          t3d = performance.now();
+          const m = await import("./view3d.js");
+          await m.default();
+          log(`3D: tải + khởi tạo wasm ${Math.round(performance.now() - t3d)} ms`);
+          m.start();
+          this.mod = m;
+        })();
+        await this.loading;
+      }
+      this.mod.push_state(json);
+    },
+    hide() {
+      document.getElementById("wrap3d").style.display = "none";
+    },
+  };
+
+  import init from "./shell.js";
+  await init();
+  log(`vỏ 2D sẵn sàng sau ${Math.round(performance.now() - tPage)} ms`);
+</script>

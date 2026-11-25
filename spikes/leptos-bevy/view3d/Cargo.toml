@@ -1,0 +1,37 @@
+[package]
+name = "view3d"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+kind-bars.workspace = true
+serde_json.workspace = true
+wasm-bindgen.workspace = true
+# Cùng bộ feature với spikes/bevy-min để số đo so sánh được.
+bevy = { version = "=0.20.1", default-features = false, features = [
+    "std",
+    "async_executor",
+    "bevy_asset",
+    "bevy_log",
+    "bevy_winit",
+    "bevy_window",
+    "webgl2",
+    "web",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_pbr",
+    "bevy_light",
+    "bevy_camera",
+    "bevy_mesh",
+    "bevy_material",
+    "bevy_shader",
+    "bevy_color",
+    "bevy_picking",
+    "mesh_picking",
+    "mouse",
+    "touch",
+] }

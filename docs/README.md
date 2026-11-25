@@ -17,7 +17,7 @@
 | [0005](adr/0005-du-lieu-tre-em.md) | Nguyên tắc dữ liệu trẻ em | Chấp nhận (pháp lý chưa xác minh) |
 | [0006](adr/0006-ranh-gioi-crate.md) | Ranh giới crate và hướng phụ thuộc | Chấp nhận |
 | [0007](adr/0007-cong-cu-du-an.md) | Công cụ dự án bằng `cargo xtask` | Chấp nhận |
-| [0008](adr/0008-leptos-bevy-de-xuat.md) | Leptos, Bevy, Axum | **Đề xuất — chờ spike** |
+| [0008](adr/0008-leptos-bevy-de-xuat.md) | Leptos, Bevy, Axum | **Đề xuất — 3/4 đạt, chờ đo điện thoại** |
 | [0009](adr/0009-hop-dong-loi.md) | Hợp đồng lõi: mô hình, dấu vết, chấm, nội dung | Bị thay thế bởi 0010 |
 | [0010](adr/0010-loi-trung-lap.md) | Lõi trung lập: loại hoạt động là crate, sổ đăng ký là enum đóng | Chấp nhận |
 
@@ -32,4 +32,4 @@ Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, 
 | 2 | Hợp đồng lõi: trait mô hình, định dạng dấu vết có phiên bản, chấm/chẩn đoán, lược đồ nội dung; một mô hình thật (thanh cắt + thước) | Xong |
 | 3 | `dyen replay`, dấu vết mẫu + snapshot test, property test, kiểm tra nội dung trong CI | Xong |
 | 4 | Tái cấu trúc lõi trung lập (ADR 0010): `kernel`, `kind-bars`, `registry` | Xong |
-| — | Spike Leptos + Bevy (chốt ADR 0008) | Chưa |
+| — | Spike Leptos + Bevy (chốt ADR 0008) | Đang làm — còn đo trên điện thoại |

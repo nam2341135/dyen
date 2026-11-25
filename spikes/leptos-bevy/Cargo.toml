@@ -1,0 +1,18 @@
+# Spike ADR 0008 (3): Leptos + Bevy cùng trang, trao đổi State/Input hai chiều.
+# Ngoài workspace chính (spikes/README.md).
+[workspace]
+resolver = "3"
+members = ["shell", "view3d"]
+
+[workspace.dependencies]
+kernel = { path = "../../crates/kernel" }
+kind-bars = { path = "../../crates/kinds/bars" }
+serde_json = "1"
+wasm-bindgen = "=0.2.130"
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false # wasm-opt bỏ tên; giữ section target_features cho wasm-bindgen
