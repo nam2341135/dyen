@@ -1,4 +1,4 @@
-//! Kiểm tra toàn bộ thư mục `content/` của repo: nội dung sai làm CI đỏ (ADR 0009).
+//! Kiểm tra toàn bộ thư mục `content/` của repo: nội dung sai làm CI đỏ (ADR 0004).
 
 use std::path::Path;
 

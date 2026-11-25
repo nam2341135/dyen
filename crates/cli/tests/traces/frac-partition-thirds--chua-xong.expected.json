@@ -1,6 +1,6 @@
 {
   "activity": "frac-partition-thirds",
-  "model": "bars",
+  "kind": "bars",
   "format": 1,
   "steps": 1,
   "final_state": {
@@ -16,9 +16,9 @@
     ],
     "ruler": []
   },
-  "assessment": {
+  "outcome": {
     "score": 0,
-    "solved": false,
-    "observations": []
+    "completed": false,
+    "findings": []
   }
 }

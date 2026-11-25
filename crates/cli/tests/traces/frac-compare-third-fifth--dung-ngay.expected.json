@@ -1,6 +1,6 @@
 {
   "activity": "frac-compare-third-fifth",
-  "model": "bars",
+  "kind": "bars",
   "format": 1,
   "steps": 1,
   "final_state": {
@@ -21,13 +21,13 @@
     ],
     "ruler": []
   },
-  "assessment": {
+  "outcome": {
     "score": 1000,
-    "solved": true,
-    "observations": [
+    "completed": true,
+    "findings": [
       {
-        "concept": "frac.compare-same-numerator",
-        "finding": "demonstrated",
+        "tag": "frac.compare-same-numerator",
+        "recovered": false,
         "confidence": "tentative",
         "evidence": [
           0

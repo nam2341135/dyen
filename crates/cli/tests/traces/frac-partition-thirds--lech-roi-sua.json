@@ -1,9 +1,9 @@
 {"format":1,"entries":[
-  {"at_ms":2000,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":200}}},
-  {"at_ms":3500,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":400}}},
-  {"at_ms":5000,"actor":"system","step":{"model":{"op":"join","bar":0,"at":200}}},
-  {"at_ms":5000,"actor":"system","step":{"model":{"op":"join","bar":0,"at":400}}},
-  {"at_ms":8000,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":285}}},
-  {"at_ms":9500,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":560}}},
-  {"at_ms":10000,"actor":"learner","step":{"answer":"done"}}
+  {"at_ms":2000,"actor":"learner","input":{"op":"cut","bar":0,"at":200}},
+  {"at_ms":3500,"actor":"learner","input":{"op":"cut","bar":0,"at":400}},
+  {"at_ms":5000,"actor":"system","input":{"op":"join","bar":0,"at":200}},
+  {"at_ms":5000,"actor":"system","input":{"op":"join","bar":0,"at":400}},
+  {"at_ms":8000,"actor":"learner","input":{"op":"cut","bar":0,"at":285}},
+  {"at_ms":9500,"actor":"learner","input":{"op":"cut","bar":0,"at":560}},
+  {"at_ms":10000,"actor":"learner","input":{"op":"done"}}
 ]}

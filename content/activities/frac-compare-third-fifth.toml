@@ -1,14 +1,14 @@
 id = "frac-compare-third-fifth"
 title = "Một phần ba và một phần năm"
 prompt = "1/3 và 1/5, phân số nào lớn hơn? Dùng thanh để kiểm tra."
-concepts = ["frac.compare-same-numerator"]
+tags = ["frac.compare-same-numerator"]
 
-[model]
+[config]
 kind = "bars"
 bars = 2
 partitions = [3, 5]
 
-[task]
+[config.task]
 kind = "compare"
 left = "1/3"
 right = "1/5"

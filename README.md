@@ -1,6 +1,6 @@
 # dyen
 
-Nền tảng học bằng thao tác mô hình — từ mầm non đến đại học, bắt đầu với phân số lớp 4.
+Nền tảng học tập từ mầm non đến đại học, bằng Rust, cho web và mobile.
 
 **Giai đoạn hiện tại: nền móng.** Chưa có sản phẩm chạy được.
 
@@ -24,9 +24,9 @@ cargo xtask fmt    # định dạng code
 
 ```
 crates/
-  domain/     kiểu dùng chung (thuần)
-  manip/      mô hình: trạng thái, hành động, phát lại (thuần)
-  diagnose/   chấm và chẩn đoán từ dấu vết (thuần)
+  kernel/     hợp đồng chung: Kind, dấu vết, phát lại, Outcome (thuần)
+  kinds/      mỗi loại hoạt động một crate, vd. kinds/bars (thuần)
+  registry/   danh sách đóng các loại hoạt động (thuần)
   content/    đọc + kiểm tra nội dung học
   cli/        công cụ `dyen`
 xtask/        công cụ dự án (cargo xtask)

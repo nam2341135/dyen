@@ -1,7 +1,7 @@
 //! Mã định danh ổn định cho nội dung học.
 //!
 //! Định dạng: 1–64 ký tự `a-z`, `0-9`, `-`, `.`; không bắt đầu hay kết thúc bằng
-//! `-`/`.`, không có `..`. Ví dụ: `frac.compare-same-numerator`.
+//! `-`/`.`, không có `..`. Ví dụ: `bars.equal-parts`.
 
 use std::fmt;
 
@@ -66,20 +66,16 @@ macro_rules! id_type {
 }
 
 id_type!(
-    /// Mã một khái niệm trong đồ thị kiến thức.
-    ConceptId
-);
-id_type!(
-    /// Mã một hiểu sai đã biết.
-    MisconceptionId
-);
-id_type!(
     /// Mã một hoạt động (trùng tên file nội dung).
     ActivityId
 );
 id_type!(
     /// Mã một gói hoạt động.
     ActivitySetId
+);
+id_type!(
+    /// Mã một nhãn mà kết quả đánh giá gắn vào phát hiện.
+    TagId
 );
 
 #[cfg(test)]
@@ -89,7 +85,7 @@ mod tests {
     #[test]
     fn chap_nhan_ma_hop_le() {
         for s in ["frac", "frac.unit-fraction", "a1.b2-c3", "x"] {
-            assert!(ConceptId::new(s).is_ok(), "{s}");
+            assert!(TagId::new(s).is_ok(), "{s}");
         }
     }
 
@@ -106,15 +102,15 @@ mod tests {
             "a b",
             long.as_str(),
         ] {
-            assert!(ConceptId::new(s).is_err(), "{s:?}");
+            assert!(TagId::new(s).is_err(), "{s:?}");
         }
     }
 
     #[test]
     fn serde_kiem_tra_khi_doc() {
-        let ok: ConceptId = serde_json::from_str("\"frac.unit\"").unwrap();
+        let ok: TagId = serde_json::from_str("\"frac.unit\"").unwrap();
         assert_eq!(ok.as_str(), "frac.unit");
-        assert!(serde_json::from_str::<ConceptId>("\"Frac\"").is_err());
+        assert!(serde_json::from_str::<TagId>("\"Frac\"").is_err());
         assert_eq!(serde_json::to_string(&ok).unwrap(), "\"frac.unit\"");
     }
 }

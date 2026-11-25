@@ -1,6 +1,6 @@
 {
   "activity": "frac-partition-thirds",
-  "model": "bars",
+  "kind": "bars",
   "format": 1,
   "steps": 7,
   "final_state": {
@@ -17,15 +17,13 @@
     ],
     "ruler": []
   },
-  "assessment": {
+  "outcome": {
     "score": 1000,
-    "solved": true,
-    "observations": [
+    "completed": true,
+    "findings": [
       {
-        "concept": "frac.equal-parts",
-        "finding": {
-          "self_corrected": "frac.unequal-parts"
-        },
+        "tag": "frac.unequal-parts",
+        "recovered": true,
         "confidence": "tentative",
         "evidence": [
           1,

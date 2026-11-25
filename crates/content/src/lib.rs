@@ -1,10 +1,11 @@
-//! Đọc và kiểm tra nội dung học trong thư mục `content/` (ADR 0004, 0009).
+//! Đọc và kiểm tra nội dung trong thư mục `content/` (ADR 0004, 0010).
 //!
 //! Bố cục:
-//! - `concepts.toml` — đồ thị khái niệm (`[[concept]]`) và hiểu sai (`[[misconception]]`),
-//! - `activities/<id>.toml` — một hoạt động mỗi file,
+//! - `tags.toml` — danh sách nhãn (`[[tag]]`) mà phát hiện và hoạt động dùng,
+//! - `activities/<id>.toml` — một hoạt động mỗi file, cấu hình ở bảng `[config]`,
 //! - `sets/<id>.toml` — một gói hoạt động mỗi file.
 //!
+//! Crate này không biết loại hoạt động nào: cấu hình được [`registry`] đọc và kiểm tra.
 //! Phân tích ([`Library::from_sources`]) tách khỏi đọc đĩa ([`Library::load`]).
 //! Mọi lỗi được gom lại và báo một lần.
 
@@ -12,37 +13,21 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::path::Path;
 
-use diagnose::Task;
-use domain::{ActivityId, ActivitySetId, ConceptId, MisconceptionId};
-use manip::ModelSetup;
+use kernel::{ActivityId, ActivitySetId, TagId};
+use registry::AnyConfig;
 use serde::Deserialize;
 
-/// Một khái niệm trong đồ thị kiến thức.
+/// Một nhãn: tên hiển thị cho mã mà phát hiện và hoạt động dùng.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct Concept {
+pub struct Tag {
     /// Mã.
-    pub id: ConceptId,
-    /// Tên hiển thị.
-    pub title: String,
-    /// Khái niệm tiên quyết.
-    #[serde(default)]
-    pub requires: Vec<ConceptId>,
-}
-
-/// Một hiểu sai đã biết, gắn với một khái niệm.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Misconception {
-    /// Mã.
-    pub id: MisconceptionId,
-    /// Khái niệm liên quan.
-    pub concept: ConceptId,
-    /// Mô tả ngắn cho giáo viên.
+    pub id: TagId,
+    /// Tên hiển thị cho giáo viên.
     pub title: String,
 }
 
-/// Một hoạt động: mô hình + nhiệm vụ.
+/// Một hoạt động: chữ trình bày + cấu hình của một loại hoạt động.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Activity {
@@ -52,12 +37,11 @@ pub struct Activity {
     pub title: String,
     /// Lời dẫn cho người học.
     pub prompt: String,
-    /// Khái niệm hoạt động luyện (ít nhất một).
-    pub concepts: Vec<ConceptId>,
-    /// Cấu hình mô hình.
-    pub model: ModelSetup,
-    /// Yêu cầu.
-    pub task: Task,
+    /// Nhãn để lọc, tìm kiếm (không ảnh hưởng chấm).
+    #[serde(default)]
+    pub tags: Vec<TagId>,
+    /// Cấu hình, gồm `kind` chọn loại hoạt động.
+    pub config: AnyConfig,
 }
 
 /// Một gói hoạt động theo thứ tự.
@@ -74,11 +58,9 @@ pub struct ActivitySet {
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-struct ConceptsFile {
+struct TagsFile {
     #[serde(default)]
-    concept: Vec<Concept>,
-    #[serde(default)]
-    misconception: Vec<Misconception>,
+    tag: Vec<Tag>,
 }
 
 /// Văn bản nguồn của nội dung, chưa phân tích.
@@ -86,8 +68,8 @@ struct ConceptsFile {
 /// Mỗi phần tử của `activities`/`sets` là `(tên file không đuôi, nội dung)`.
 #[derive(Debug, Clone, Default)]
 pub struct Sources {
-    /// Nội dung `concepts.toml`.
-    pub concepts: String,
+    /// Nội dung `tags.toml`.
+    pub tags: String,
     /// Các file hoạt động.
     pub activities: Vec<(String, String)>,
     /// Các file gói hoạt động.
@@ -126,13 +108,12 @@ impl fmt::Display for ContentErrors {
 /// Toàn bộ nội dung đã kiểm tra.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Library {
-    concepts: BTreeMap<ConceptId, Concept>,
-    misconceptions: BTreeMap<MisconceptionId, Misconception>,
+    tags: BTreeMap<TagId, Tag>,
     activities: BTreeMap<ActivityId, Activity>,
     sets: BTreeMap<ActivitySetId, ActivitySet>,
 }
 
-const CONCEPTS_FILE: &str = "concepts.toml";
+const TAGS_FILE: &str = "tags.toml";
 
 #[derive(Default)]
 struct Errors(Vec<ContentError>);
@@ -159,30 +140,22 @@ impl Library {
     pub fn from_sources(src: &Sources) -> Result<Self, ContentErrors> {
         let mut errs = Errors::default();
         let mut lib = Self {
-            concepts: BTreeMap::new(),
-            misconceptions: BTreeMap::new(),
+            tags: BTreeMap::new(),
             activities: BTreeMap::new(),
             sets: BTreeMap::new(),
         };
 
-        match toml::from_str::<ConceptsFile>(&src.concepts) {
+        match toml::from_str::<TagsFile>(&src.tags) {
             Ok(file) => {
-                for c in file.concept {
-                    if lib.concepts.contains_key(&c.id) {
-                        errs.push(CONCEPTS_FILE, format!("khái niệm `{}` bị trùng", c.id));
+                for t in file.tag {
+                    if lib.tags.contains_key(&t.id) {
+                        errs.push(TAGS_FILE, format!("nhãn `{}` bị trùng", t.id));
                     } else {
-                        lib.concepts.insert(c.id.clone(), c);
-                    }
-                }
-                for m in file.misconception {
-                    if lib.misconceptions.contains_key(&m.id) {
-                        errs.push(CONCEPTS_FILE, format!("hiểu sai `{}` bị trùng", m.id));
-                    } else {
-                        lib.misconceptions.insert(m.id.clone(), m);
+                        lib.tags.insert(t.id.clone(), t);
                     }
                 }
             }
-            Err(e) => errs.push(CONCEPTS_FILE, e.to_string()),
+            Err(e) => errs.push(TAGS_FILE, e.to_string()),
         }
 
         for (stem, text) in &src.activities {
@@ -230,8 +203,8 @@ impl Library {
     /// Thư mục `activities/` hoặc `sets/` không tồn tại được coi là rỗng.
     pub fn load(dir: &Path) -> Result<Self, ContentErrors> {
         let mut errs = Errors::default();
-        let concepts = std::fs::read_to_string(dir.join(CONCEPTS_FILE)).unwrap_or_else(|e| {
-            errs.push(CONCEPTS_FILE, format!("không đọc được: {e}"));
+        let tags = std::fs::read_to_string(dir.join(TAGS_FILE)).unwrap_or_else(|e| {
+            errs.push(TAGS_FILE, format!("không đọc được: {e}"));
             String::new()
         });
         let activities = read_toml_dir(dir, "activities", &mut errs);
@@ -240,7 +213,7 @@ impl Library {
             return Err(ContentErrors(errs.0));
         }
         Self::from_sources(&Sources {
-            concepts,
+            tags,
             activities,
             sets,
         })
@@ -248,63 +221,23 @@ impl Library {
 
     /// Các kiểm tra chéo giữa các file.
     fn check(&self, errs: &mut Errors) {
-        for c in self.concepts.values() {
-            for r in &c.requires {
-                if !self.concepts.contains_key(r) {
-                    errs.push(
-                        CONCEPTS_FILE,
-                        format!("khái niệm `{}` cần `{r}` không tồn tại", c.id),
-                    );
-                }
-            }
-        }
-        if let Some(id) = self.find_cycle() {
-            errs.push(
-                CONCEPTS_FILE,
-                format!("đồ thị khái niệm có chu trình qua `{id}`"),
-            );
-        }
-        for m in self.misconceptions.values() {
-            if !self.concepts.contains_key(&m.concept) {
+        for id in registry::all_tags() {
+            if !self.tags.keys().any(|k| k.as_str() == id) {
                 errs.push(
-                    CONCEPTS_FILE,
-                    format!(
-                        "hiểu sai `{}` gắn với khái niệm `{}` không tồn tại",
-                        m.id, m.concept
-                    ),
-                );
-            }
-        }
-        for id in diagnose::CONCEPTS {
-            if !self.concepts.keys().any(|k| k.as_str() == *id) {
-                errs.push(
-                    CONCEPTS_FILE,
-                    format!("thiếu khái niệm `{id}` mà bộ chẩn đoán dùng"),
-                );
-            }
-        }
-        for id in diagnose::MISCONCEPTIONS {
-            if !self.misconceptions.keys().any(|k| k.as_str() == *id) {
-                errs.push(
-                    CONCEPTS_FILE,
-                    format!("thiếu hiểu sai `{id}` mà bộ chẩn đoán dùng"),
+                    TAGS_FILE,
+                    format!("thiếu nhãn `{id}` mà một loại hoạt động dùng"),
                 );
             }
         }
 
         for a in self.activities.values() {
             let file = activity_file(a.id.as_str());
-            if a.concepts.is_empty() {
-                errs.push(&file, "phải luyện ít nhất một khái niệm");
-            }
-            for c in &a.concepts {
-                if !self.concepts.contains_key(c) {
-                    errs.push(&file, format!("khái niệm `{c}` không tồn tại"));
+            for t in &a.tags {
+                if !self.tags.contains_key(t) {
+                    errs.push(&file, format!("nhãn `{t}` không tồn tại"));
                 }
             }
-            if let Err(e) = a.model.validate() {
-                errs.push(&file, e.to_string());
-            } else if let Err(e) = diagnose::validate_task(&a.task, &a.model) {
+            if let Err(e) = a.config.validate() {
                 errs.push(&file, e.to_string());
             }
         }
@@ -326,47 +259,9 @@ impl Library {
         }
     }
 
-    /// Tìm một khái niệm nằm trên chu trình `requires`, nếu có.
-    fn find_cycle(&self) -> Option<&ConceptId> {
-        // 0 = chưa thăm, 1 = đang thăm, 2 = xong.
-        let mut mark: BTreeMap<&ConceptId, u8> = BTreeMap::new();
-        fn visit<'a>(
-            lib: &'a Library,
-            id: &'a ConceptId,
-            mark: &mut BTreeMap<&'a ConceptId, u8>,
-        ) -> Option<&'a ConceptId> {
-            match mark.get(id) {
-                Some(1) => return Some(id),
-                Some(_) => return None,
-                None => {}
-            }
-            mark.insert(id, 1);
-            for r in lib
-                .concepts
-                .get(id)
-                .map(|c| c.requires.as_slice())
-                .unwrap_or(&[])
-            {
-                if let Some(found) = visit(lib, r, mark) {
-                    return Some(found);
-                }
-            }
-            mark.insert(id, 2);
-            None
-        }
-        self.concepts
-            .keys()
-            .find_map(|id| visit(self, id, &mut mark))
-    }
-
-    /// Các khái niệm, theo mã.
-    pub fn concepts(&self) -> &BTreeMap<ConceptId, Concept> {
-        &self.concepts
-    }
-
-    /// Các hiểu sai, theo mã.
-    pub fn misconceptions(&self) -> &BTreeMap<MisconceptionId, Misconception> {
-        &self.misconceptions
+    /// Các nhãn, theo mã.
+    pub fn tags(&self) -> &BTreeMap<TagId, Tag> {
+        &self.tags
     }
 
     /// Các hoạt động, theo mã.
@@ -425,24 +320,21 @@ fn read_toml_dir(dir: &Path, sub: &str, errs: &mut Errors) -> Vec<(String, Strin
 mod tests {
     use super::*;
 
-    const CONCEPTS: &str = r#"
-[[concept]]
+    const TAGS: &str = r#"
+[[tag]]
 id = "frac.equal-parts"
 title = "Các phần bằng nhau"
 
-[[concept]]
+[[tag]]
 id = "frac.compare-same-numerator"
 title = "So sánh cùng tử số"
-requires = ["frac.equal-parts"]
 
-[[misconception]]
+[[tag]]
 id = "frac.unequal-parts"
-concept = "frac.equal-parts"
 title = "Chia đủ số phần nhưng không bằng nhau"
 
-[[misconception]]
+[[tag]]
 id = "frac.larger-denominator-larger"
-concept = "frac.compare-same-numerator"
 title = "Mẫu lớn hơn thì lớn hơn"
 "#;
 
@@ -450,27 +342,26 @@ title = "Mẫu lớn hơn thì lớn hơn"
 id = "a1"
 title = "Một phần ba và một phần năm"
 prompt = "Phần nào lớn hơn?"
-concepts = ["frac.compare-same-numerator"]
+tags = ["frac.compare-same-numerator"]
 
-[model]
+[config]
 kind = "bars"
 bars = 2
 partitions = [3, 5]
 
-[task]
+[config.task]
 kind = "compare"
 left = "1/3"
 right = "1/5"
 "#;
 
+    const SET: &str = "id = \"s1\"\ntitle = \"G\"\nactivities = [\"a1\"]\n";
+
     fn sources() -> Sources {
         Sources {
-            concepts: CONCEPTS.into(),
+            tags: TAGS.into(),
             activities: vec![("a1".into(), ACTIVITY.into())],
-            sets: vec![(
-                "s1".into(),
-                "id = \"s1\"\ntitle = \"G\"\nactivities = [\"a1\"]\n".into(),
-            )],
+            sets: vec![("s1".into(), SET.into())],
         }
     }
 
@@ -486,9 +377,11 @@ right = "1/5"
     #[test]
     fn hop_le() {
         let lib = Library::from_sources(&sources()).unwrap();
-        assert_eq!(lib.concepts().len(), 2);
+        assert_eq!(lib.tags().len(), 4);
         assert_eq!(lib.activities().len(), 1);
         assert_eq!(lib.sets().len(), 1);
+        let a = lib.activities().values().next().unwrap();
+        assert_eq!(a.config.kind(), "bars");
     }
 
     #[test]
@@ -505,27 +398,36 @@ right = "1/5"
     }
 
     #[test]
-    fn tham_chieu_hong_va_chu_trinh() {
+    fn tham_chieu_hong() {
         let mut s = sources();
-        s.concepts = s.concepts.replace(
-            "title = \"Các phần bằng nhau\"",
-            "title = \"x\"\nrequires = [\"frac.compare-same-numerator\"]",
-        );
-        s.activities[0].1 = ACTIVITY.replace("partitions = [3, 5]", "partitions = [3]");
-        s.sets[0].1 = "id = \"s1\"\ntitle = \"G\"\nactivities = [\"zz\", \"a1\", \"a1\"]\n".into();
+        s.activities[0].1 = ACTIVITY
+            .replace("partitions = [3, 5]", "partitions = [3]")
+            .replace(
+                "tags = [\"frac.compare-same-numerator\"]",
+                "tags = [\"zz.tag\"]",
+            );
+        s.sets[0].1 = SET.replace("[\"a1\"]", "[\"zz\", \"a1\", \"a1\"]");
         let e = errors(&s);
-        assert!(e.iter().any(|m| m.contains("chu trình")), "{e:?}");
         assert!(e.iter().any(|m| m.contains("không dựng được 1/5")), "{e:?}");
+        assert!(e.iter().any(|m| m.contains("nhãn `zz.tag`")), "{e:?}");
         assert!(e.iter().any(|m| m.contains("`zz` không tồn tại")), "{e:?}");
         assert!(e.iter().any(|m| m.contains("lặp lại")), "{e:?}");
     }
 
     #[test]
-    fn thieu_ma_chan_doan() {
+    fn loai_la_va_thieu_nhan() {
         let mut s = sources();
-        s.concepts = CONCEPTS.split("[[misconception]]").next().unwrap().into();
+        s.tags = TAGS.replace("frac.unequal-parts", "other.tag");
+        s.activities[0].1 = ACTIVITY.replace("kind = \"bars\"", "kind = \"nope\"");
         let e = errors(&s);
-        assert!(e.iter().any(|m| m.contains("frac.unequal-parts")), "{e:?}");
+        assert!(
+            e.iter().any(|m| m.contains("`frac.unequal-parts`")),
+            "{e:?}"
+        );
+        assert!(
+            e.iter().any(|m| m.starts_with("activities/a1.toml")),
+            "{e:?}"
+        );
     }
 
     #[test]

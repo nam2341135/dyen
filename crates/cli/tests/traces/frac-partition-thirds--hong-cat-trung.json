@@ -1,4 +1,4 @@
 {"format":1,"entries":[
-  {"at_ms":1000,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":420}}},
-  {"at_ms":2000,"actor":"learner","step":{"model":{"op":"cut","bar":0,"at":420}}}
+  {"at_ms":1000,"actor":"learner","input":{"op":"cut","bar":0,"at":420}},
+  {"at_ms":2000,"actor":"learner","input":{"op":"cut","bar":0,"at":420}}
 ]}

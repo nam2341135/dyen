@@ -1,4 +1,4 @@
-//! Phân số không âm, số học nguyên tất định (ADR 0003, 0009).
+//! Phân số không âm, số học nguyên tất định (ADR 0003).
 
 use std::cmp::Ordering;
 use std::fmt;

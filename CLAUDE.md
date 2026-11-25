@@ -1,6 +1,6 @@
 # Hướng dẫn cho AI làm việc trong dự án này
 
-Dự án: nền tảng học bằng thao tác mô hình (xem `docs/vision.md`). Giai đoạn hiện tại: **xây nền móng**, chưa xây sản phẩm. Lộ trình ở `docs/README.md`.
+Dự án: nền tảng học tập, lõi trung lập về sư phạm (xem `docs/vision.md`, ADR 0010). Giai đoạn hiện tại: **xây nền móng**, chưa xây sản phẩm. Lộ trình ở `docs/README.md`.
 
 ## Đọc trước khi viết code
 
@@ -27,14 +27,20 @@ Không báo "xong" khi chưa chạy `cargo xtask ci` và thấy nó qua. Nếu n
 
 ## Ranh giới (ADR 0006) — máy kiểm tra, không thương lượng
 
-- `domain` ← `manip` ← `diagnose`. `content`, `cli` ở ngoài. Bảng đầy đủ ở ADR 0006.
-- **Crate thuần** (`domain`, `manip`, `diagnose`): không IO, không mạng, không đồng hồ, không thread, không số ngẫu nhiên không seed. Chỉ phụ thuộc ngoài trong danh sách cho phép ở `xtask/src/deps.rs`.
+- `kernel` ← `kind-*` ← `registry` ← `content` ← `cli`. Mỗi `kind-*` chỉ phụ thuộc `kernel`, không phụ thuộc loại khác. Bảng đầy đủ ở ADR 0006.
+- **Crate thuần** (`kernel`, `kind-*`, `registry`): không IO, không mạng, không đồng hồ, không thread, không số ngẫu nhiên không seed. Chỉ phụ thuộc ngoài trong danh sách cho phép ở `xtask/src/deps.rs`.
 - Muốn thêm phụ thuộc vào crate thuần: hỏi trước. Nếu được đồng ý, sửa danh sách trong `xtask/src/deps.rs` và cập nhật ADR 0006.
-- Thêm crate mới: cập nhật cả ADR 0006 và `xtask/src/deps.rs` trong cùng thay đổi.
+- Thêm crate mới: cập nhật cả ADR 0006 và `xtask/src/deps.rs` trong cùng thay đổi. Ngoại lệ: loại hoạt động mới `crates/kinds/<tên>` (crate `kind-<tên>`) tự khớp quy tắc `kind-*`.
 
-## Quy tắc logic mô hình (ADR 0002, 0003)
+## Loại hoạt động (ADR 0010)
 
-- Bộ hiển thị (2D/3D) **không** giữ hay sửa trạng thái học tập. Chỉ vẽ `State` và phát `Action`.
+- Lõi (`kernel`) không biết môn học hay sư phạm. Đừng đưa khái niệm của một ý tưởng cụ thể vào `kernel`, `registry`, `content` hay `cli`.
+- Thêm ý tưởng = thêm crate `crates/kinds/<tên>` hiện thực `kernel::Kind`, có README thuật ngữ riêng và một test chạy `kernel::contract::check`; rồi thêm biến thể vào `registry`. Nhãn mới phải có trong `content/tags.toml`.
+- Thuật ngữ riêng của một loại nằm trong README của crate đó, không trong `docs/glossary.md`.
+
+## Quy tắc logic (ADR 0002, 0003)
+
+- Bộ hiển thị (2D/3D) **không** giữ hay sửa trạng thái học tập. Chỉ vẽ `State` và phát `Input`.
 - `apply` / `replay` phải tất định. Dùng số nguyên hoặc phân số hữu tỉ cho mọi quyết định logic; `f32/f64` chỉ dùng cho hiển thị.
 - Không dùng `HashMap`/`HashSet` ở nơi thứ tự duyệt ảnh hưởng kết quả — dùng `BTreeMap`/`Vec`.
 - Định dạng dấu vết có số phiên bản; thay đổi phá tương thích phải tăng phiên bản và giữ đường đọc bản cũ.

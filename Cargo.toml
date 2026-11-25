@@ -1,6 +1,13 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "xtask"]
+members = [
+    "crates/kernel",
+    "crates/kinds/*",
+    "crates/registry",
+    "crates/content",
+    "crates/cli",
+    "xtask",
+]
 
 [workspace.package]
 version = "0.0.0"
@@ -11,9 +18,9 @@ publish = false
 
 [workspace.dependencies]
 # Nội bộ
-domain = { path = "crates/domain" }
-manip = { path = "crates/manip" }
-diagnose = { path = "crates/diagnose" }
+kernel = { path = "crates/kernel" }
+kind-bars = { path = "crates/kinds/bars" }
+registry = { path = "crates/registry" }
 content = { path = "crates/content" }
 # Bên ngoài (crate thuần chỉ được dùng serde, thiserror — ADR 0006)
 serde = { version = "1", features = ["derive"] }

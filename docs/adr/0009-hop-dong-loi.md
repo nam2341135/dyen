@@ -1,6 +1,6 @@
 # ADR 0009: Hợp đồng lõi — mô hình, dấu vết, chấm, nội dung
 
-- **Trạng thái:** Chấp nhận
+- **Trạng thái:** Bị thay thế bởi [ADR 0010](0010-loi-trung-lap.md)
 - **Ngày:** 2026-11-26
 
 ## Bối cảnh

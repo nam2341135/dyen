@@ -1,45 +1,49 @@
-//! Kết quả chẩn đoán và điểm số (ADR 0009).
+//! Kết quả đánh giá một dấu vết (ADR 0010).
+//!
+//! Lõi không biết ý nghĩa của nhãn: mỗi loại hoạt động tự khai báo nhãn nó dùng
+//! ([`crate::Kind::TAGS`]), nội dung đặt tên hiển thị cho nhãn.
 
 use serde::{Deserialize, Serialize};
 
-use crate::{ConceptId, MisconceptionId};
+use crate::TagId;
 
-/// Một kết luận chẩn đoán rút ra từ dấu vết, kèm bằng chứng.
+/// Kết quả đánh giá: điểm, đã hoàn thành chưa, và các phát hiện kèm bằng chứng.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Observation {
-    /// Khái niệm liên quan.
-    pub concept: ConceptId,
-    /// Điều quan sát được.
-    pub finding: Finding,
+pub struct Outcome {
+    /// Điểm, phần nghìn.
+    pub score: Score,
+    /// Bài làm đã đạt yêu cầu của hoạt động chưa.
+    pub completed: bool,
+    /// Các phát hiện, theo thứ tự loại hoạt động đưa ra.
+    pub findings: Vec<Finding>,
+}
+
+/// Một dấu hiệu rút ra từ dấu vết, gắn với một nhãn.
+///
+/// Lõi không biết nhãn là điều tốt hay xấu; nhãn và nghĩa của nó do loại hoạt động định nghĩa.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Finding {
+    /// Nhãn (phải nằm trong `Kind::TAGS` của loại hoạt động).
+    pub tag: TagId,
+    /// `true` nếu dấu hiệu đã xuất hiện rồi người học tự rời khỏi nó trong cùng bài làm.
+    pub recovered: bool,
     /// Mức tin cậy.
     pub confidence: Confidence,
-    /// Chỉ số các bước trong dấu vết làm bằng chứng (tăng dần).
+    /// Chỉ số các bước của người học làm bằng chứng, tăng dần, không trùng.
     pub evidence: Vec<u32>,
 }
 
-/// Điều chẩn đoán quan sát được về một khái niệm.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Finding {
-    /// Người học thể hiện hiểu sai này.
-    Misconception(MisconceptionId),
-    /// Người học từng thể hiện hiểu sai này rồi tự sửa trong cùng bài làm.
-    SelfCorrected(MisconceptionId),
-    /// Người học thể hiện hiểu đúng khái niệm.
-    Demonstrated,
-}
-
-/// Mức tin cậy của một quan sát.
+/// Mức tin cậy của một phát hiện.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Confidence {
-    /// Một dấu hiệu đơn lẻ; cần thêm bằng chứng.
+    /// Một dấu hiệu đơn lẻ.
     Tentative,
     /// Dấu hiệu rõ hoặc lặp lại.
     Strong,
 }
 
-/// Điểm số tính bằng phần nghìn, `0..=1000`. Không dùng số thực (ADR 0009).
+/// Điểm tính bằng phần nghìn, `0..=1000`. Không dùng số thực (ADR 0003).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(try_from = "u16", into = "u16")]
 pub struct Score(u16);
@@ -95,18 +99,18 @@ mod tests {
     }
 
     #[test]
-    fn quan_sat_serde() {
-        let o = Observation {
-            concept: ConceptId::new("frac.x").unwrap(),
-            finding: Finding::Misconception(MisconceptionId::new("frac.y").unwrap()),
+    fn phat_hien_serde() {
+        let f = Finding {
+            tag: TagId::new("x.y").unwrap(),
+            recovered: true,
             confidence: Confidence::Strong,
             evidence: vec![3],
         };
-        let json = serde_json::to_string(&o).unwrap();
+        let json = serde_json::to_string(&f).unwrap();
         assert_eq!(
             json,
-            r#"{"concept":"frac.x","finding":{"misconception":"frac.y"},"confidence":"strong","evidence":[3]}"#
+            r#"{"tag":"x.y","recovered":true,"confidence":"strong","evidence":[3]}"#
         );
-        assert_eq!(serde_json::from_str::<Observation>(&json).unwrap(), o);
+        assert_eq!(serde_json::from_str::<Finding>(&json).unwrap(), f);
     }
 }

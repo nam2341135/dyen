@@ -1,23 +1,22 @@
-//! Dấu vết, phát lại và phiên thao tác (ADR 0003, 0009).
+//! Dấu vết, phát lại và phiên (ADR 0003, 0010).
 
-use domain::Relation;
 use serde::{Deserialize, Serialize};
 
-use crate::{Manipulative, Rejection, SetupError};
+use crate::{ConfigError, Kind, Outcome, Rejection};
 
 /// Phiên bản định dạng dấu vết hiện tại. Tăng khi thay đổi phá tương thích.
 pub const TRACE_FORMAT: u16 = 1;
 
-/// Dấu vết: chuỗi bước đã được chấp nhận, có thứ tự.
+/// Dấu vết: chuỗi đầu vào đã được chấp nhận, có thứ tự.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Trace<A> {
+pub struct Trace<I> {
     /// Phiên bản định dạng.
     pub format: u16,
     /// Các bước theo thứ tự thời gian.
-    pub entries: Vec<Entry<A>>,
+    pub entries: Vec<Entry<I>>,
 }
 
-impl<A> Trace<A> {
+impl<I> Trace<I> {
     /// Dấu vết rỗng với định dạng hiện tại.
     pub fn new() -> Self {
         Self {
@@ -27,7 +26,7 @@ impl<A> Trace<A> {
     }
 
     /// Duyệt các bước của người học kèm chỉ số.
-    pub fn learner_entries(&self) -> impl Iterator<Item = (u32, &Entry<A>)> {
+    pub fn learner_entries(&self) -> impl Iterator<Item = (u32, &Entry<I>)> {
         self.entries
             .iter()
             .enumerate()
@@ -36,7 +35,7 @@ impl<A> Trace<A> {
     }
 }
 
-impl<A> Default for Trace<A> {
+impl<I> Default for Trace<I> {
     fn default() -> Self {
         Self::new()
     }
@@ -49,43 +48,23 @@ fn index(i: usize) -> u32 {
 
 /// Một bước trong dấu vết.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Entry<A> {
+pub struct Entry<I> {
     /// Mili-giây tương đối từ lúc bắt đầu hoạt động; không giảm.
     pub at_ms: u32,
     /// Ai gây ra bước này.
     pub actor: Actor,
-    /// Nội dung bước.
-    pub step: Step<A>,
+    /// Đầu vào, kiểu do loại hoạt động định nghĩa.
+    pub input: I,
 }
 
 /// Ai gây ra một bước.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Actor {
-    /// Người học.
+    /// Người học. Chỉ bước của người học được làm bằng chứng.
     Learner,
-    /// Hệ thống (vd. phản hồi tự dựng lại mô hình).
+    /// Hệ thống (vd. phản hồi tự thao tác lại).
     System,
-}
-
-/// Nội dung một bước: thao tác mô hình hoặc trả lời.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Step<A> {
-    /// Hành động trên mô hình.
-    Model(A),
-    /// Câu trả lời; không đổi trạng thái mô hình.
-    Answer(Answer),
-}
-
-/// Câu trả lời của người học.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Answer {
-    /// Chọn quan hệ `<`, `=`, `>` giữa hai đại lượng.
-    Compare(Relation),
-    /// Báo đã làm xong (với nhiệm vụ mà kết quả nằm trong trạng thái mô hình).
-    Done,
 }
 
 /// Kết quả phát lại: chuỗi trạng thái.
@@ -114,16 +93,16 @@ pub enum ReplayError {
         /// Phiên bản tìm thấy.
         found: u16,
     },
-    /// Cấu hình mô hình không hợp lệ.
+    /// Cấu hình không hợp lệ.
     #[error(transparent)]
-    Setup(#[from] SetupError),
+    Config(#[from] ConfigError),
     /// Thời gian đi lùi.
     #[error("bước {index}: thời gian đi lùi")]
     TimeWentBack {
         /// Chỉ số bước.
         index: u32,
     },
-    /// Một bước bị mô hình từ chối — dấu vết bị sửa hoặc lệch phiên bản.
+    /// Một bước bị từ chối — dấu vết bị sửa hoặc lệch phiên bản.
     #[error("bước {index}: {rejection}")]
     Rejected {
         /// Chỉ số bước.
@@ -134,17 +113,17 @@ pub enum ReplayError {
 }
 
 /// Phát lại dấu vết từ cấu hình. Tất định.
-pub fn replay<M: Manipulative>(
-    setup: &M::Setup,
-    trace: &Trace<M::Action>,
-) -> Result<Replay<M::State>, ReplayError> {
+pub fn replay<K: Kind>(
+    config: &K::Config,
+    trace: &Trace<K::Input>,
+) -> Result<Replay<K::State>, ReplayError> {
     if trace.format != TRACE_FORMAT {
         return Err(ReplayError::Format {
             found: trace.format,
         });
     }
     let mut states = Vec::with_capacity(trace.entries.len() + 1);
-    let mut state = M::init(setup)?;
+    let mut state = K::init(config)?;
     let mut last_ms = 0;
     for (i, entry) in trace.entries.iter().enumerate() {
         let index = index(i);
@@ -152,25 +131,32 @@ pub fn replay<M: Manipulative>(
             return Err(ReplayError::TimeWentBack { index });
         }
         last_ms = entry.at_ms;
-        let next = match &entry.step {
-            Step::Model(action) => M::apply(&state, action)
-                .map_err(|rejection| ReplayError::Rejected { index, rejection })?,
-            Step::Answer(_) => state.clone(),
-        };
+        let next = K::apply(&state, &entry.input)
+            .map_err(|rejection| ReplayError::Rejected { index, rejection })?;
         states.push(std::mem::replace(&mut state, next));
     }
     states.push(state);
     Ok(Replay { states })
 }
 
-/// Phiên thao tác đang diễn ra: giữ trạng thái có thẩm quyền và ghi dấu vết.
+/// Phát lại rồi đánh giá. Cách duy nhất nên dùng để chấm (client và server như nhau).
+pub fn run<K: Kind>(
+    config: &K::Config,
+    trace: &Trace<K::Input>,
+) -> Result<(Replay<K::State>, Outcome), ReplayError> {
+    let replay = replay::<K>(config, trace)?;
+    let outcome = K::evaluate(config, trace, &replay.states);
+    Ok((replay, outcome))
+}
+
+/// Phiên đang diễn ra: giữ trạng thái có thẩm quyền và ghi dấu vết.
 ///
-/// Vỏ ứng dụng giữ một `Session`; bộ hiển thị đọc [`Session::state`] và gửi bước
-/// qua [`Session::act`]. Chỉ bước được chấp nhận mới vào dấu vết (ADR 0009).
-pub struct Session<M: Manipulative> {
-    setup: M::Setup,
-    state: M::State,
-    trace: Trace<M::Action>,
+/// Vỏ ứng dụng giữ một `Session`; bộ hiển thị đọc [`Session::state`] và gửi đầu vào
+/// qua [`Session::act`]. Chỉ đầu vào được chấp nhận mới vào dấu vết.
+pub struct Session<K: Kind> {
+    config: K::Config,
+    state: K::State,
+    trace: Trace<K::Input>,
 }
 
 /// Bước bị phiên từ chối.
@@ -184,52 +170,49 @@ pub enum SessionError {
         /// Thời điểm bước trước.
         last_ms: u32,
     },
-    /// Mô hình từ chối hành động.
+    /// Loại hoạt động từ chối đầu vào.
     #[error(transparent)]
     Rejected(#[from] Rejection),
 }
 
-impl<M: Manipulative> Session<M> {
+impl<K: Kind> Session<K> {
     /// Bắt đầu phiên mới.
-    pub fn new(setup: M::Setup) -> Result<Self, SetupError> {
-        let state = M::init(&setup)?;
+    pub fn new(config: K::Config) -> Result<Self, ConfigError> {
+        let state = K::init(&config)?;
         Ok(Self {
-            setup,
+            config,
             state,
             trace: Trace::new(),
         })
     }
 
     /// Cấu hình của phiên.
-    pub fn setup(&self) -> &M::Setup {
-        &self.setup
+    pub fn config(&self) -> &K::Config {
+        &self.config
     }
 
     /// Trạng thái hiện tại.
-    pub fn state(&self) -> &M::State {
+    pub fn state(&self) -> &K::State {
         &self.state
     }
 
     /// Dấu vết tới thời điểm này.
-    pub fn trace(&self) -> &Trace<M::Action> {
+    pub fn trace(&self) -> &Trace<K::Input> {
         &self.trace
     }
 
     /// Thực hiện một bước. Nếu bị từ chối, trạng thái và dấu vết không đổi.
-    pub fn act(
-        &mut self,
-        at_ms: u32,
-        actor: Actor,
-        step: Step<M::Action>,
-    ) -> Result<(), SessionError> {
+    pub fn act(&mut self, at_ms: u32, actor: Actor, input: K::Input) -> Result<(), SessionError> {
         let last_ms = self.trace.entries.last().map_or(0, |e| e.at_ms);
         if at_ms < last_ms {
             return Err(SessionError::TimeWentBack { at_ms, last_ms });
         }
-        if let Step::Model(action) = &step {
-            self.state = M::apply(&self.state, action)?;
-        }
-        self.trace.entries.push(Entry { at_ms, actor, step });
+        self.state = K::apply(&self.state, &input)?;
+        self.trace.entries.push(Entry {
+            at_ms,
+            actor,
+            input,
+        });
         Ok(())
     }
 }

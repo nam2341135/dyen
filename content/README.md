@@ -1,9 +1,9 @@
 # Nội dung học
 
-Dạng file TOML trong git (ADR 0004), lược đồ ở ADR 0009. `cargo xtask ci` kiểm tra toàn bộ thư mục này.
+Dạng file TOML trong git (ADR 0004). `cargo xtask ci` và `dyen check` kiểm tra toàn bộ thư mục này.
 
-- `concepts.toml` — `[[concept]]` (`id`, `title`, `requires`) và `[[misconception]]` (`id`, `concept`, `title`).
-- `activities/<id>.toml` — `id` (trùng tên file), `title`, `prompt`, `concepts`, bảng `[model]` (`kind = "bars"`, `bars`, `partitions`, `freehand`) và `[task]` (`kind = "compare"` với `left`/`right`, hoặc `kind = "partition"` với `bar`/`parts`).
+- `tags.toml` — `[[tag]]` (`id`, `title`). Phải chứa mọi nhãn mà các loại hoạt động công bố.
+- `activities/<id>.toml` — `id` (trùng tên file), `title`, `prompt`, `tags` (tùy chọn), và bảng `[config]` với `kind = "<loại hoạt động>"`; các trường còn lại do loại hoạt động định nghĩa (xem README của crate trong `crates/kinds/<loại>/`).
 - `sets/<id>.toml` — `id`, `title`, `activities` theo thứ tự.
 
-Không đổi mã đã phát hành: dấu vết và quan sát trỏ tới mã.
+Không đổi mã đã phát hành: dữ liệu đã lưu trỏ tới mã.

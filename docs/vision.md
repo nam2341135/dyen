@@ -1,37 +1,30 @@
 # Tầm nhìn
 
-> Tài liệu một trang. Nếu một quyết định mâu thuẫn với trang này, hoặc trang này sai, hoặc quyết định sai — sửa một trong hai, đừng để cả hai cùng tồn tại.
+> Một trang. Nếu một quyết định mâu thuẫn với trang này, sửa một trong hai — đừng để cả hai cùng tồn tại.
 
-## Một câu
+## Dự án là gì
 
-**Người học hiểu một khái niệm bằng cách thao tác lên mô hình của nó; hệ thống đọc chuỗi thao tác để biết họ đang nghĩ gì, rồi giúp họ tiến thêm đúng một bước.**
+Nền tảng học tập từ mầm non đến đại học, viết hoàn toàn bằng Rust, chạy trên web và điện thoại, coi trọng 3D và mỹ thuật, bằng tiếng Việt.
 
-## Ba thứ làm nên sản phẩm
+**Chưa chọn ý tưởng sư phạm nào làm cốt lõi.** Ý tưởng (thao tác mô hình, trắc nghiệm, chẩn đoán hiểu sai, mô phỏng…) là thứ sẽ được thêm, sửa, thay, bỏ thường xuyên. Việc của giai đoạn này là dựng kiến trúc để làm những việc đó rẻ và an toàn.
 
-1. **Mô hình** — vật thể có quy tắc (thanh đất sét cắt được, thước so sánh, bình nước, cân đĩa, vector…). Người học tác động bằng *hành động*.
-2. **Dấu vết** — chuỗi hành động có thứ tự, nhỏ gọn, phát lại được. Là nguồn sự thật duy nhất về việc người học đã làm gì.
-3. **Chẩn đoán** — hàm thuần đọc dấu vết, sinh ra *quan sát* gắn với *khái niệm* và *hiểu sai* đã biết, kèm bằng chứng.
+## Ràng buộc (do chủ dự án đặt, không thương lượng)
 
-Mọi vai trò dùng chung ba thứ này:
+- **Rust cho toàn bộ mã ứng dụng** ([ADR 0001](adr/0001-rust-toan-bo.md)).
+- **Web và mobile**; phải chạy được trên máy yếu.
+- **3D và mỹ thuật là đầu tư nghiêm túc**, nhưng không chức năng học tập nào chỉ có ở 3D ([ADR 0002](adr/0002-mot-mo-hinh-nhieu-bo-hien-thi.md)).
+- **Dữ liệu trẻ em: thu tối thiểu, không bên thứ ba** ([ADR 0005](adr/0005-du-lieu-tre-em.md)).
+- **Phát triển bằng vibecode** (AI viết phần lớn code) — nên ranh giới phải do máy kiểm, không chỉ ghi trong tài liệu.
 
-| Vai trò | Dùng như thế nào |
-|---|---|
-| Học sinh | Thao tác, nhận phản hồi một bước |
-| Giáo viên | Giao bài, xem lớp chia theo nhóm hiểu sai, phát lại dấu vết đại diện |
-| Người chăm sóc | Xem "khoảnh khắc" (phát lại ngắn), nhận một hoạt động tại nhà |
+## Nguyên tắc kiến trúc
 
-## Người dùng đầu tiên (giả định cần kiểm chứng)
-
-Học sinh lớp 4 học phân số, bài tập 15 phút trên điện thoại phụ huynh, do giáo viên giao.
-
-## Nguyên tắc không thương lượng
-
-- **3D là màn hình, không phải bộ não.** Mọi trạng thái học tập nằm trong logic thuần; 3D và 2D chỉ hiển thị trạng thái và phát hành động.
-- **Mọi nhiệm vụ hoàn thành được ở chế độ 2D / giảm chuyển động.** Không có tính năng chỉ dành cho máy mạnh.
-- **Một lần sai đổi lấy một bước nhìn thấy, không đổi lấy một bài giảng.**
-- **Đổi ý là dữ liệu, không phải lỗi.**
-- **Dữ liệu trẻ em: thu tối thiểu, không bên thứ ba.** Xem [ADR 0005](adr/0005-du-lieu-tre-em.md).
+1. **Lõi trung lập.** Crate `kernel` không biết môn học, sư phạm hay cách chấm cụ thể nào. Nó chỉ định nghĩa hợp đồng chung: một *loại hoạt động* có cấu hình, trạng thái, đầu vào, hàm áp dụng và hàm đánh giá ([ADR 0010](adr/0010-loi-trung-lap.md)).
+2. **Mỗi ý tưởng là một crate.** Một loại hoạt động sống trọn trong `crates/kinds/<tên>/`: kiểu, quy tắc, cách đánh giá, thuật ngữ riêng, test. Thêm ý tưởng = thêm thư mục; bỏ ý tưởng = xóa thư mục. Các loại không phụ thuộc nhau.
+3. **Một chỗ duy nhất biết mọi loại.** Crate `registry` là enum đóng liệt kê các loại; trình biên dịch chỉ ra mọi chỗ cần sửa khi thêm/bớt. Không hệ plugin động.
+4. **Logic thuần, tách khỏi IO và hiển thị.** Mọi quyết định học tập là hàm thuần, tất định, chạy giống nhau ở client, server và test ([ADR 0003](adr/0003-dau-vet-la-nguon-su-that.md)).
+5. **Hợp đồng được kiểm bằng máy.** Mỗi loại hoạt động chạy qua cùng bộ kiểm `kernel::contract` (tất định, từ chối không đổi trạng thái, phát lại khớp, bằng chứng hợp lệ). Ranh giới crate do `cargo xtask deps` kiểm ([ADR 0006](adr/0006-ranh-gioi-crate.md)).
+6. **Nội dung là dữ liệu.** Hoạt động là file TOML trong git, kiểm tra lúc CI ([ADR 0004](adr/0004-noi-dung-la-file.md)).
 
 ## Giai đoạn hiện tại: nền móng
 
-Chưa xây sản phẩm. Đang dựng: tài liệu quyết định → bộ khung workspace → hợp đồng lõi → bộ kiểm tra không cần giao diện. Xem [docs/README.md](README.md).
+Chưa xây sản phẩm. Có một loại hoạt động mẫu (`kind-bars`: thanh cắt được + so sánh phân số) để chứng minh hợp đồng dùng được — nó không phải định hướng sản phẩm. Xem [docs/README.md](README.md).

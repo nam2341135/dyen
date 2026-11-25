@@ -12,8 +12,6 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use content::{Activity, Library};
-use diagnose::Assessment;
-use manip::{Manipulative, ModelSetup, Trace, bars};
 use serde::Serialize;
 
 const USAGE: &str = "\
@@ -75,9 +73,8 @@ fn run(args: &[String]) -> Result<String, Fail> {
         ["check"] => {
             let lib = load(&content_dir)?;
             Ok(format!(
-                "✓ nội dung hợp lệ: {} khái niệm, {} hiểu sai, {} hoạt động, {} gói",
-                lib.concepts().len(),
-                lib.misconceptions().len(),
+                "✓ nội dung hợp lệ: {} nhãn, {} hoạt động, {} gói",
+                lib.tags().len(),
                 lib.activities().len(),
                 lib.sets().len()
             ))
@@ -104,53 +101,20 @@ fn load(dir: &Path) -> Result<Library, Fail> {
 
 /// Báo cáo phát lại — ổn định để làm snapshot.
 #[derive(Serialize)]
-struct Report<'a, S> {
+struct Report<'a> {
     activity: &'a str,
-    model: &'static str,
-    format: u16,
-    steps: usize,
-    final_state: &'a S,
-    assessment: Assessment,
+    #[serde(flatten)]
+    run: registry::Run,
 }
 
-/// Chỗ duy nhất rẽ nhánh theo loại mô hình.
 fn replay_activity(activity: &Activity, trace_json: &str) -> Result<String, Fail> {
-    match &activity.model {
-        ModelSetup::Bars(setup) => {
-            let trace: Trace<bars::Action> = parse_trace(trace_json)?;
-            let run = manip::replay::<bars::Bars>(setup, &trace)
-                .map_err(|e| fail(2, format!("dấu vết không hợp lệ: {e}")))?;
-            let assessment = diagnose::assess_bars(&activity.task, setup, &trace)
-                .map_err(|e| fail(2, format!("không chấm được: {e}")))?;
-            report(
-                activity,
-                bars::Bars::KIND,
-                &trace,
-                run.final_state(),
-                assessment,
-            )
-        }
-    }
-}
-
-fn parse_trace<A: serde::de::DeserializeOwned>(json: &str) -> Result<Trace<A>, Fail> {
-    serde_json::from_str(json).map_err(|e| fail(2, format!("dấu vết không đọc được: {e}")))
-}
-
-fn report<A, S: Serialize>(
-    activity: &Activity,
-    model: &'static str,
-    trace: &Trace<A>,
-    final_state: &S,
-    assessment: Assessment,
-) -> Result<String, Fail> {
+    let mut de = serde_json::Deserializer::from_str(trace_json);
+    let run = registry::run(&activity.config, &mut de).map_err(|e| fail(2, e.to_string()))?;
+    de.end()
+        .map_err(|e| fail(2, format!("dấu vết không đọc được: {e}")))?;
     let r = Report {
         activity: activity.id.as_str(),
-        model,
-        format: trace.format,
-        steps: trace.entries.len(),
-        final_state,
-        assessment,
+        run,
     };
     serde_json::to_string_pretty(&r).map_err(|e| fail(1, e.to_string()))
 }

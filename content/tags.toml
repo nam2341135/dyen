@@ -1,21 +1,19 @@
-# Đồ thị khái niệm và hiểu sai đã biết (ADR 0004, 0009).
-# Mã: a-z, 0-9, '-', '.'. Không đổi mã đã phát hành — dấu vết và quan sát trỏ tới nó.
+# Nhãn mà phát hiện (Finding) và hoạt động dùng (ADR 0010).
+# Mỗi nhãn một loại hoạt động công bố trong `Kind::TAGS` phải có ở đây — `dyen check` kiểm.
+# Mã: a-z, 0-9, '-', '.'. Không đổi mã đã phát hành — dữ liệu đã lưu trỏ tới nó.
 
-[[concept]]
+[[tag]]
 id = "frac.equal-parts"
 title = "Phân số cần các phần bằng nhau"
 
-[[concept]]
+[[tag]]
 id = "frac.compare-same-numerator"
 title = "So sánh hai phân số cùng tử số"
-requires = ["frac.equal-parts"]
 
-[[misconception]]
+[[tag]]
 id = "frac.unequal-parts"
-concept = "frac.equal-parts"
 title = "Chia đủ số phần nhưng các phần không bằng nhau"
 
-[[misconception]]
+[[tag]]
 id = "frac.larger-denominator-larger"
-concept = "frac.compare-same-numerator"
 title = "Nghĩ mẫu số lớn hơn thì phân số lớn hơn"

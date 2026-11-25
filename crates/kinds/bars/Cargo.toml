@@ -1,6 +1,6 @@
 [package]
-name = "diagnose"
-description = "Chấm và chẩn đoán từ dấu vết (crate thuần)"
+name = "kind-bars"
+description = "Loại hoạt động thanh cắt được và thước so sánh (crate thuần)"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,8 +8,7 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-domain.workspace = true
-manip.workspace = true
+kernel.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 

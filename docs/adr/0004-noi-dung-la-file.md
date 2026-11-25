@@ -9,8 +9,8 @@ Giai đoạn đầu nội dung do đội viết (có AI hỗ trợ), số lượ
 
 ## Quyết định
 
-- Hoạt động, gói hoạt động, đồ thị khái niệm và danh sách hiểu sai là **file văn bản** trong thư mục `content/` (định dạng RON hoặc TOML — chốt khi làm tầng 2).
-- Crate `content` đọc và **kiểm tra** toàn bộ nội dung: tham chiếu khái niệm có tồn tại, mã không trùng, trạng thái đầu hợp lệ với mô hình, mọi hiểu sai được chẩn đoán có ít nhất một dấu vết mẫu.
+- Hoạt động, gói hoạt động và danh sách nhãn là **file TOML** trong thư mục `content/` (lược đồ ở ADR 0010).
+- Crate `content` đọc và **kiểm tra** toàn bộ nội dung: mã không trùng và trùng tên file, tham chiếu tồn tại, cấu hình hợp lệ với loại hoạt động, mọi nhãn mà các loại dùng đều có tên hiển thị.
 - Kiểm tra nội dung là một phần của `cargo xtask ci`; nội dung sai làm CI đỏ.
 - Mỗi hoạt động có mã ổn định và số phiên bản; bài làm ghi lại phiên bản đã dùng.
 
