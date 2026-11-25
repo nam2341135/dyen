@@ -1,0 +1,18 @@
+[package]
+name = "cli"
+description = "Công cụ dòng lệnh dyen: phát lại dấu vết, kiểm tra nội dung"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# Thêm phụ thuộc nội bộ khi thật sự dùng; danh sách được phép ở ADR 0006 / xtask/src/deps.rs.
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "dyen"
+path = "src/main.rs"
