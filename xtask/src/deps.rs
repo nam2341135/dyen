@@ -10,10 +10,13 @@ use serde_json::Value;
 /// (crate, các crate nội bộ được phép phụ thuộc, có phải crate thuần không).
 ///
 /// Mẫu kết thúc bằng `*` khớp theo tiền tố: `kind-*` là mọi crate loại hoạt động
-/// (`crates/kinds/<tên>`, ADR 0010) — mỗi loại chỉ được phụ thuộc lõi, không phụ thuộc nhau.
+/// (`crates/kinds/<tên>`, ADR 0010) — mỗi loại chỉ được phụ thuộc lõi và thư viện thuần
+/// dùng chung, không phụ thuộc nhau. `lib-*` là thư viện thuần dùng chung
+/// (`crates/libs/<tên>`, ADR 0012) — không biết lõi.
 const RULES: &[(&str, &[&str], bool)] = &[
     ("kernel", &[], true),
-    ("kind-*", &["kernel"], true),
+    ("lib-*", &["lib-*"], true),
+    ("kind-*", &["kernel", "lib-*"], true),
     ("registry", &["kernel", "kind-*"], true),
     ("content", &["kernel", "registry"], false),
     ("cli", &["kernel", "registry", "content"], false),
@@ -163,6 +166,29 @@ mod tests {
     fn bat_thu_vien_ngoai_trong_crate_thuan() {
         let meta = json!({ "packages": [pkg("kind-bars", &[("bevy", None)])] });
         assert_eq!(violations(&meta).len(), 1);
+    }
+
+    #[test]
+    fn thu_vien_dung_chung_cho_loai_hoat_dong() {
+        let meta = json!({ "packages": [
+            pkg("kernel", &[]),
+            pkg("lib-exact", &[("serde", None)]),
+            pkg("lib-geo", &[("lib-exact", None)]),
+            pkg("kind-a", &[("kernel", None), ("lib-geo", None), ("lib-exact", None)]),
+        ]});
+        assert!(violations(&meta).is_empty(), "{:?}", violations(&meta));
+    }
+
+    #[test]
+    fn thu_vien_dung_chung_khong_biet_loi() {
+        let meta = json!({ "packages": [
+            pkg("lib-exact", &[("kernel", None), ("kind-a", None), ("bevy", None)]),
+            pkg("registry", &[("lib-exact", None)]),
+            pkg("kernel", &[("lib-exact", None)]),
+            pkg("kind-a", &[]),
+        ]});
+        let errs = violations(&meta);
+        assert_eq!(errs.len(), 5, "{errs:?}");
     }
 
     #[test]

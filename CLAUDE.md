@@ -27,8 +27,9 @@ Không báo "xong" khi chưa chạy `cargo xtask ci` và thấy nó qua. Nếu n
 
 ## Ranh giới (ADR 0006) — máy kiểm tra, không thương lượng
 
-- `kernel` ← `kind-*` ← `registry` ← `content` ← `cli`. Mỗi `kind-*` chỉ phụ thuộc `kernel`, không phụ thuộc loại khác. Bảng đầy đủ ở ADR 0006.
-- **Crate thuần** (`kernel`, `kind-*`, `registry`): không IO, không mạng, không đồng hồ, không thread, không số ngẫu nhiên không seed. Chỉ phụ thuộc ngoài trong danh sách cho phép ở `xtask/src/deps.rs`.
+- `kernel` ← `kind-*` ← `registry` ← `content` ← `cli`. Mỗi `kind-*` chỉ phụ thuộc `kernel` và `lib-*`, không phụ thuộc loại khác. Bảng đầy đủ ở ADR 0006.
+- `lib-*` (`crates/libs/<tên>`, ADR 0012): thư viện thuần dùng chung cho các `kind-*` (vd. `lib-exact`: số hữu tỉ, hình học chính xác). Không biết `Kind`, dấu vết, nhãn hay sư phạm; chỉ phụ thuộc `lib-*` khác. Chỉ thêm khi có ≥ 2 loại dùng (hoặc 1 loại + 1 loại sắp làm có bản nháp), và ghi tên crate trong ADR.
+- **Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`): không IO, không mạng, không đồng hồ, không thread, không số ngẫu nhiên không seed. Chỉ phụ thuộc ngoài trong danh sách cho phép ở `xtask/src/deps.rs`.
 - Muốn thêm phụ thuộc vào crate thuần: hỏi trước. Nếu được đồng ý, sửa danh sách trong `xtask/src/deps.rs` và cập nhật ADR 0006.
 - Thêm crate mới: cập nhật cả ADR 0006 và `xtask/src/deps.rs` trong cùng thay đổi. Ngoại lệ: loại hoạt động mới `crates/kinds/<tên>` (crate `kind-<tên>`) tự khớp quy tắc `kind-*`.
 
