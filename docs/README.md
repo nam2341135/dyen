@@ -18,6 +18,7 @@
 | [0006](adr/0006-ranh-gioi-crate.md) | Ranh giới crate và hướng phụ thuộc | Chấp nhận |
 | [0007](adr/0007-cong-cu-du-an.md) | Công cụ dự án bằng `cargo xtask` | Chấp nhận |
 | [0008](adr/0008-leptos-bevy-de-xuat.md) | Leptos, Bevy, Axum | **Đề xuất — chờ spike** |
+| [0009](adr/0009-hop-dong-loi.md) | Hợp đồng lõi: mô hình, dấu vết, chấm, nội dung | Chấp nhận |
 
 Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, cập nhật bảng này.
 
@@ -27,6 +28,6 @@ Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, 
 |---|---|---|
 | 0 | Tài liệu quyết định (thư mục này, `CLAUDE.md`) | Xong |
 | 1 | Bộ khung workspace, `cargo xtask ci`, kiểm tra ranh giới | Xong |
-| 2 | Hợp đồng lõi: trait mô hình, định dạng dấu vết có phiên bản, chấm/chẩn đoán, lược đồ nội dung; một mô hình thật (thanh cắt + thước) | Chưa |
+| 2 | Hợp đồng lõi: trait mô hình, định dạng dấu vết có phiên bản, chấm/chẩn đoán, lược đồ nội dung; một mô hình thật (thanh cắt + thước) | Xong |
 | 3 | `dyen replay`, dấu vết mẫu + snapshot test, property test, kiểm tra nội dung trong CI | Chưa |
 | — | Spike Leptos + Bevy (chốt ADR 0008) | Chưa |

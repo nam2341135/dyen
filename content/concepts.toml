@@ -1,0 +1,21 @@
+# Đồ thị khái niệm và hiểu sai đã biết (ADR 0004, 0009).
+# Mã: a-z, 0-9, '-', '.'. Không đổi mã đã phát hành — dấu vết và quan sát trỏ tới nó.
+
+[[concept]]
+id = "frac.equal-parts"
+title = "Phân số cần các phần bằng nhau"
+
+[[concept]]
+id = "frac.compare-same-numerator"
+title = "So sánh hai phân số cùng tử số"
+requires = ["frac.equal-parts"]
+
+[[misconception]]
+id = "frac.unequal-parts"
+concept = "frac.equal-parts"
+title = "Chia đủ số phần nhưng các phần không bằng nhau"
+
+[[misconception]]
+id = "frac.larger-denominator-larger"
+concept = "frac.compare-same-numerator"
+title = "Nghĩ mẫu số lớn hơn thì phân số lớn hơn"

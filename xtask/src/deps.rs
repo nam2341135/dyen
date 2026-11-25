@@ -12,7 +12,7 @@ const RULES: &[(&str, &[&str], bool)] = &[
     ("domain", &[], true),
     ("manip", &["domain"], true),
     ("diagnose", &["domain", "manip"], true),
-    ("content", &["domain", "manip"], false),
+    ("content", &["domain", "manip", "diagnose"], false),
     ("cli", &["domain", "manip", "diagnose", "content"], false),
     ("xtask", &[], false),
 ];

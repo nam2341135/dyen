@@ -16,7 +16,7 @@ Workspace chia theo ranh giới trách nhiệm:
 | `domain` | Kiểu dùng chung: mã định danh, khái niệm, hiểu sai, quan sát | — | Thuần |
 | `manip` | Mô hình: trạng thái, hành động, áp dụng, phát lại | `domain` | Thuần |
 | `diagnose` | Chấm và chẩn đoán từ dấu vết | `domain`, `manip` | Thuần |
-| `content` | Đọc và kiểm tra file nội dung | `domain`, `manip` | Có IO |
+| `content` | Đọc và kiểm tra file nội dung | `domain`, `manip`, `diagnose` (kiểm tra nhiệm vụ và mã chẩn đoán — ADR 0009) | Có IO |
 | `cli` | Công cụ dòng lệnh `dyen` (phát lại, kiểm tra nội dung) | mọi crate trên | Có IO |
 | `xtask` | Công cụ dự án (CI cục bộ, kiểm tra ranh giới) | — | Công cụ |
 

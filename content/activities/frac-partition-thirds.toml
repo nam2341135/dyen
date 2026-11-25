@@ -1,0 +1,14 @@
+id = "frac-partition-thirds"
+title = "Chia thanh thành ba phần bằng nhau"
+prompt = "Hãy cắt thanh thành 3 phần bằng nhau."
+concepts = ["frac.equal-parts"]
+
+[model]
+kind = "bars"
+bars = 1
+freehand = true
+
+[task]
+kind = "partition"
+bar = 0
+parts = 3
