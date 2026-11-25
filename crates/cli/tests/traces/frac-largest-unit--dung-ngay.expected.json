@@ -1,0 +1,28 @@
+{
+  "activity": "frac-largest-unit",
+  "kind": "choice",
+  "format": 1,
+  "steps": 2,
+  "final_state": {
+    "multiple": false,
+    "attempts": 2,
+    "keys": [
+      "half",
+      "third",
+      "eighth"
+    ],
+    "correct": [
+      "half"
+    ],
+    "selected": [
+      "half"
+    ],
+    "submissions": 1,
+    "solved": true
+  },
+  "outcome": {
+    "score": 1000,
+    "completed": true,
+    "findings": []
+  }
+}

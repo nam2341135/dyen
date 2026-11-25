@@ -1,0 +1,22 @@
+id = "frac-largest-unit"
+title = "Phân số lớn nhất"
+prompt = "Trong các phân số sau, phân số nào lớn nhất?"
+tags = ["frac.compare-same-numerator"]
+
+[config]
+kind = "choice"
+attempts = 2
+
+[[config.items]]
+key = "half"
+text = "1/2"
+correct = true
+
+[[config.items]]
+key = "third"
+text = "1/3"
+
+[[config.items]]
+key = "eighth"
+text = "1/8"
+tag = "frac.larger-denominator-larger"

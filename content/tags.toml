@@ -1,5 +1,6 @@
 # Nhãn mà phát hiện (Finding) và hoạt động dùng (ADR 0010).
-# Mỗi nhãn một loại hoạt động công bố trong `Kind::TAGS` phải có ở đây — `dyen check` kiểm.
+# Mỗi nhãn một loại hoạt động công bố trong `Kind::TAGS`, hoặc một hoạt động đặt trong `[config]`
+# (`Kind::config_tags`, ADR 0011), phải có ở đây — `dyen check` kiểm.
 # Mã: a-z, 0-9, '-', '.'. Không đổi mã đã phát hành — dữ liệu đã lưu trỏ tới nó.
 
 [[tag]]

@@ -237,6 +237,11 @@ impl Library {
                     errs.push(&file, format!("nhãn `{t}` không tồn tại"));
                 }
             }
+            for t in a.config.config_tags() {
+                if !self.tags.contains_key(&t) {
+                    errs.push(&file, format!("nhãn `{t}` trong cấu hình không tồn tại"));
+                }
+            }
             if let Err(e) = a.config.validate() {
                 errs.push(&file, e.to_string());
             }
@@ -426,6 +431,38 @@ right = "1/5"
         );
         assert!(
             e.iter().any(|m| m.starts_with("activities/a1.toml")),
+            "{e:?}"
+        );
+    }
+
+    #[test]
+    fn nhan_trong_cau_hinh_phai_ton_tai() {
+        let choice = r#"
+id = "c1"
+title = "Chọn"
+prompt = "Phân số nào lớn hơn?"
+
+[config]
+kind = "choice"
+
+[[config.items]]
+key = "a"
+text = "1/3"
+correct = true
+
+[[config.items]]
+key = "b"
+text = "1/5"
+tag = "frac.larger-denominator-larger"
+"#;
+        let mut s = sources();
+        s.activities.push(("c1".into(), choice.into()));
+        assert!(Library::from_sources(&s).is_ok());
+        s.activities[1].1 = choice.replace("frac.larger-denominator-larger", "zz.missing");
+        let e = errors(&s);
+        assert!(
+            e.iter()
+                .any(|m| m.starts_with("activities/c1.toml") && m.contains("`zz.missing`")),
             "{e:?}"
         );
     }

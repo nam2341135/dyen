@@ -20,6 +20,7 @@ publish = false
 # Nội bộ
 kernel = { path = "crates/kernel" }
 kind-bars = { path = "crates/kinds/bars" }
+kind-choice = { path = "crates/kinds/choice" }
 registry = { path = "crates/registry" }
 content = { path = "crates/content" }
 # Bên ngoài (crate thuần chỉ được dùng serde, thiserror — ADR 0006)

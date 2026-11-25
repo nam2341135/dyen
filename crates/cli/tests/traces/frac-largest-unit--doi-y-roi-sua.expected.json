@@ -1,0 +1,38 @@
+{
+  "activity": "frac-largest-unit",
+  "kind": "choice",
+  "format": 1,
+  "steps": 5,
+  "final_state": {
+    "multiple": false,
+    "attempts": 2,
+    "keys": [
+      "half",
+      "third",
+      "eighth"
+    ],
+    "correct": [
+      "half"
+    ],
+    "selected": [
+      "half"
+    ],
+    "submissions": 2,
+    "solved": true
+  },
+  "outcome": {
+    "score": 500,
+    "completed": true,
+    "findings": [
+      {
+        "tag": "frac.larger-denominator-larger",
+        "recovered": true,
+        "confidence": "tentative",
+        "evidence": [
+          2,
+          4
+        ]
+      }
+    ]
+  }
+}

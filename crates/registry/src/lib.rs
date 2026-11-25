@@ -8,8 +8,9 @@
 //!
 //! Gỡ một loại: làm ngược lại. Không có cơ chế plugin động — cố ý.
 
-use kernel::{ConfigError, Kind, Outcome, ReplayError, Trace};
+use kernel::{ConfigError, Kind, Outcome, ReplayError, TagId, Trace};
 use kind_bars::Bars;
+use kind_choice::Choice;
 use serde::{Deserialize, Deserializer, Serialize};
 
 /// Cấu hình của mọi loại hoạt động. TOML: bảng `[config]` với `kind = "<tên loại>"`.
@@ -18,6 +19,8 @@ use serde::{Deserialize, Deserializer, Serialize};
 pub enum AnyConfig {
     /// Thanh cắt được và thước so sánh.
     Bars(kind_bars::Config),
+    /// Chọn một hoặc nhiều đáp án.
+    Choice(kind_choice::Config),
 }
 
 /// Trạng thái của mọi loại hoạt động (chỉ để báo cáo; JSON không mang tên loại).
@@ -26,23 +29,35 @@ pub enum AnyConfig {
 pub enum AnyState {
     /// Trạng thái thanh.
     Bars(kind_bars::State),
+    /// Trạng thái chọn đáp án.
+    Choice(kind_choice::State),
 }
 
 /// Tên mọi loại hoạt động đã đăng ký.
-pub const KINDS: &[&str] = &[Bars::KIND];
+pub const KINDS: &[&str] = &[Bars::KIND, Choice::KIND];
 
 impl AnyConfig {
     /// Tên loại hoạt động.
     pub fn kind(&self) -> &'static str {
         match self {
             Self::Bars(_) => Bars::KIND,
+            Self::Choice(_) => Choice::KIND,
         }
     }
 
-    /// Nhãn mà loại hoạt động này có thể gắn vào phát hiện.
+    /// Nhãn cố định mà loại hoạt động này có thể gắn vào phát hiện (`Kind::TAGS`).
     pub fn tags(&self) -> &'static [&'static str] {
         match self {
             Self::Bars(_) => Bars::TAGS,
+            Self::Choice(_) => Choice::TAGS,
+        }
+    }
+
+    /// Nhãn do người soạn đặt trong chính cấu hình này (`Kind::config_tags`, ADR 0011).
+    pub fn config_tags(&self) -> Vec<TagId> {
+        match self {
+            Self::Bars(c) => Bars::config_tags(c),
+            Self::Choice(c) => Choice::config_tags(c),
         }
     }
 
@@ -50,13 +65,15 @@ impl AnyConfig {
     pub fn validate(&self) -> Result<(), ConfigError> {
         match self {
             Self::Bars(c) => Bars::init(c).map(|_| ()),
+            Self::Choice(c) => Choice::init(c).map(|_| ()),
         }
     }
 }
 
-/// Mọi nhãn của mọi loại hoạt động, sắp xếp, không trùng.
+/// Mọi nhãn cố định (`Kind::TAGS`) của mọi loại hoạt động, sắp xếp, không trùng.
+/// Nhãn từ cấu hình xem [`AnyConfig::config_tags`].
 pub fn all_tags() -> Vec<&'static str> {
-    let mut tags: Vec<&'static str> = [Bars::TAGS].concat();
+    let mut tags: Vec<&'static str> = [Bars::TAGS, Choice::TAGS].concat();
     tags.sort_unstable();
     tags.dedup();
     tags
@@ -92,6 +109,7 @@ pub enum RunError {
 pub fn run<'de, D: Deserializer<'de>>(config: &AnyConfig, trace: D) -> Result<Run, RunError> {
     match config {
         AnyConfig::Bars(c) => run_kind::<Bars, D>(c, trace, AnyState::Bars),
+        AnyConfig::Choice(c) => run_kind::<Choice, D>(c, trace, AnyState::Choice),
     }
 }
 
@@ -148,7 +166,7 @@ right = "1/5"
         let tags = all_tags();
         assert!(tags.windows(2).all(|w| w[0] < w[1]));
         assert!(tags.contains(&kind_bars::tags::EQUAL_PARTS));
-        assert_eq!(KINDS, &["bars"]);
+        assert_eq!(KINDS, &["bars", "choice"]);
     }
 
     #[test]
@@ -171,5 +189,41 @@ right = "1/5"
             super::run(&config(), &mut serde_json::Deserializer::from_str(rejected)),
             Err(RunError::Replay(_))
         ));
+    }
+
+    const CHOICE: &str = r#"
+kind = "choice"
+
+[[items]]
+key = "a"
+text = "1/3"
+correct = true
+
+[[items]]
+key = "b"
+text = "1/5"
+tag = "frac.larger-denominator-larger"
+"#;
+
+    #[test]
+    fn loai_chon_dap_an() {
+        let c: AnyConfig = toml::from_str(CHOICE).unwrap();
+        assert_eq!(c.kind(), "choice");
+        assert!(c.validate().is_ok());
+        assert!(c.tags().is_empty());
+        let tags: Vec<String> = c.config_tags().into_iter().map(String::from).collect();
+        assert_eq!(tags, ["frac.larger-denominator-larger"]);
+        assert!(config().config_tags().is_empty());
+
+        let json = r#"{"format":1,"entries":[
+            {"at_ms":0,"actor":"learner","input":{"op":"select","key":"b"}},
+            {"at_ms":1,"actor":"learner","input":{"op":"submit"}},
+            {"at_ms":2,"actor":"learner","input":{"op":"select","key":"a"}},
+            {"at_ms":3,"actor":"learner","input":{"op":"submit"}}]}"#;
+        let run = run(&c, &mut serde_json::Deserializer::from_str(json)).unwrap();
+        assert_eq!(run.kind, "choice");
+        assert!(run.outcome.completed);
+        assert_eq!(run.outcome.score.permille(), 500);
+        assert_eq!(run.outcome.findings.len(), 1);
     }
 }

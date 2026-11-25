@@ -37,7 +37,7 @@ Lõi còn có: `Trace`, `Entry { at_ms, actor, input }`, `replay`, `run`, `Sessi
 
 ### Nội dung
 
-- `content/tags.toml` thay `concepts.toml`: danh sách `[[tag]] { id, title }`. Mọi nhãn trong `TAGS` của mọi loại phải có ở đây.
+- `content/tags.toml` thay `concepts.toml`: danh sách `[[tag]] { id, title }`. Mọi nhãn trong `TAGS` của mọi loại phải có ở đây (và mọi nhãn trong `config_tags` của từng hoạt động — [ADR 0011](0011-nhan-tu-cau-hinh.md)).
 - Hoạt động: `id`, `title`, `prompt`, `tags` (tùy chọn), bảng `[config]` có `kind` và các trường do loại định nghĩa. Chữ trình bày (`prompt`) thuộc nội dung, không thuộc `Config`.
 
 ### Định dạng dấu vết

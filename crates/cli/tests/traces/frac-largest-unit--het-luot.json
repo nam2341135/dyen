@@ -1,0 +1,5 @@
+{"format":1,"entries":[
+  {"at_ms":1800,"actor":"learner","input":{"op":"select","key":"eighth"}},
+  {"at_ms":2600,"actor":"learner","input":{"op":"submit"}},
+  {"at_ms":6000,"actor":"learner","input":{"op":"submit"}}
+]}

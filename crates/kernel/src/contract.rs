@@ -77,7 +77,8 @@ pub struct Checked<K: Kind> {
 /// 3. bất biến riêng đúng ở mọi trạng thái;
 /// 4. phát lại dấu vết cho đúng chuỗi trạng thái của phiên;
 /// 5. dấu vết khứ hồi qua `roundtrip` không đổi;
-/// 6. `evaluate` tất định; bằng chứng tăng dần, chỉ trỏ vào bước người học; nhãn nằm trong `K::TAGS`.
+/// 6. `evaluate` tất định; bằng chứng tăng dần, chỉ trỏ vào bước người học; nhãn nằm trong
+///    `K::TAGS` hoặc `K::config_tags(config)`.
 pub fn check<K: Kind>(seed: u64, spec: &Spec<'_, K>) -> Result<Checked<K>, String> {
     let fail = |msg: String| Err(format!("seed {seed}: {msg}"));
     let mut rng = Rng::new(seed);
@@ -137,7 +138,7 @@ pub fn check<K: Kind>(seed: u64, spec: &Spec<'_, K>) -> Result<Checked<K>, Strin
     if outcome != again {
         return fail("evaluate không tất định".into());
     }
-    check_outcome::<K>(&trace, &outcome).map_err(|e| format!("seed {seed}: {e}"))?;
+    check_outcome::<K>(&spec.config, &trace, &outcome).map_err(|e| format!("seed {seed}: {e}"))?;
 
     Ok(Checked {
         accepted: trace.entries.len(),
@@ -147,11 +148,23 @@ pub fn check<K: Kind>(seed: u64, spec: &Spec<'_, K>) -> Result<Checked<K>, Strin
 }
 
 /// Các tính chất mọi kết quả đánh giá phải có.
-fn check_outcome<K: Kind>(trace: &Trace<K::Input>, outcome: &Outcome) -> Result<(), String> {
-    let tags: BTreeSet<&str> = K::TAGS.iter().copied().collect();
+fn check_outcome<K: Kind>(
+    config: &K::Config,
+    trace: &Trace<K::Input>,
+    outcome: &Outcome,
+) -> Result<(), String> {
+    let from_config = K::config_tags(config);
+    let tags: BTreeSet<&str> = K::TAGS
+        .iter()
+        .copied()
+        .chain(from_config.iter().map(|t| t.as_str()))
+        .collect();
     for f in &outcome.findings {
         if !tags.contains(f.tag.as_str()) {
-            return Err(format!("nhãn `{}` không có trong TAGS", f.tag));
+            return Err(format!(
+                "nhãn `{}` không có trong TAGS hay config_tags",
+                f.tag
+            ));
         }
         if !f.evidence.windows(2).all(|w| w[0] < w[1]) {
             return Err(format!("bằng chứng không tăng dần: {f:?}"));

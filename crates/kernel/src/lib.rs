@@ -31,11 +31,11 @@ pub use trace::{
 /// - `init`, `apply`, `evaluate` là hàm thuần, tất định — cùng đầu vào, cùng kết quả, mọi máy;
 /// - `apply` từ chối đầu vào không hợp lệ thay vì sửa lặng lẽ;
 /// - `evaluate` chỉ dùng bước của [`Actor::Learner`] làm bằng chứng, bằng chứng tăng dần,
-///   và chỉ dùng nhãn trong [`Kind::TAGS`].
+///   và chỉ dùng nhãn trong [`Kind::TAGS`] hoặc [`Kind::config_tags`] của cấu hình.
 pub trait Kind {
     /// Tên loại, ổn định — dùng trong file nội dung và dữ liệu lưu.
     const KIND: &'static str;
-    /// Mọi nhãn `evaluate` có thể gắn vào phát hiện.
+    /// Nhãn do chính loại hoạt động định nghĩa mà `evaluate` có thể gắn vào phát hiện.
     const TAGS: &'static [&'static str];
     /// Cấu hình của một hoạt động, đọc từ file nội dung.
     type Config: Clone + Debug + PartialEq + Serialize + DeserializeOwned;
@@ -43,6 +43,13 @@ pub trait Kind {
     type State: Clone + Debug + PartialEq + Serialize + DeserializeOwned;
     /// Một đầu vào nguyên tử từ người học hoặc hệ thống.
     type Input: Clone + Debug + PartialEq + Serialize + DeserializeOwned;
+
+    /// Nhãn lấy từ cấu hình (do người soạn nội dung đặt) mà `evaluate` có thể gắn vào
+    /// phát hiện, ngoài [`Kind::TAGS`] (ADR 0011). Mặc định: không có.
+    fn config_tags(config: &Self::Config) -> Vec<TagId> {
+        let _ = config;
+        Vec::new()
+    }
 
     /// Dựng trạng thái đầu; lỗi nếu cấu hình không hợp lệ.
     fn init(config: &Self::Config) -> Result<Self::State, ConfigError>;

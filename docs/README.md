@@ -20,6 +20,7 @@
 | [0008](adr/0008-leptos-bevy-de-xuat.md) | Leptos, Bevy, Axum | **Đề xuất — 3/4 đạt, chờ đo điện thoại** |
 | [0009](adr/0009-hop-dong-loi.md) | Hợp đồng lõi: mô hình, dấu vết, chấm, nội dung | Bị thay thế bởi 0010 |
 | [0010](adr/0010-loi-trung-lap.md) | Lõi trung lập: loại hoạt động là crate, sổ đăng ký là enum đóng | Chấp nhận |
+| [0011](adr/0011-nhan-tu-cau-hinh.md) | Loại hoạt động công bố thêm nhãn từ cấu hình | Chấp nhận |
 
 Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, cập nhật bảng này.
 
@@ -33,3 +34,4 @@ Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, 
 | 3 | `dyen replay`, dấu vết mẫu + snapshot test, property test, kiểm tra nội dung trong CI | Xong |
 | 4 | Tái cấu trúc lõi trung lập (ADR 0010): `kernel`, `kind-bars`, `registry` | Xong |
 | — | Spike Leptos + Bevy (chốt ADR 0008) | Đang làm — còn đo trên điện thoại |
+| — | Loại hoạt động thứ hai `kind-choice` (kiểm chứng ADR 0010; sinh ra ADR 0011) | Xong |

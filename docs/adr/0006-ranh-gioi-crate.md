@@ -14,7 +14,7 @@ Workspace chia theo ranh giới trách nhiệm:
 | Crate | Trách nhiệm | Được phụ thuộc (nội bộ) | Loại |
 |---|---|---|---|
 | `kernel` | Hợp đồng chung: trait `Kind`, dấu vết, phát lại, `Outcome`, mã định danh, bộ kiểm hợp đồng (ADR 0010) | — | Thuần |
-| `kind-*` (`crates/kinds/<tên>`) | Một loại hoạt động; hiện có `kind-bars` | `kernel` (không phụ thuộc loại khác) | Thuần |
+| `kind-*` (`crates/kinds/<tên>`) | Một loại hoạt động; hiện có `kind-bars`, `kind-choice` | `kernel` (không phụ thuộc loại khác) | Thuần |
 | `registry` | Danh sách đóng các loại hoạt động; chỗ duy nhất rẽ nhánh theo loại | `kernel`, `kind-*` | Thuần |
 | `content` | Đọc và kiểm tra file nội dung | `kernel`, `registry` | Có IO |
 | `cli` | Công cụ dòng lệnh `dyen` (phát lại, kiểm tra nội dung) | `kernel`, `registry`, `content` | Có IO |

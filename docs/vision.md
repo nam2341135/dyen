@@ -27,4 +27,4 @@ Nền tảng học tập từ mầm non đến đại học, viết hoàn toàn 
 
 ## Giai đoạn hiện tại: nền móng
 
-Chưa xây sản phẩm. Có một loại hoạt động mẫu (`kind-bars`: thanh cắt được + so sánh phân số) để chứng minh hợp đồng dùng được — nó không phải định hướng sản phẩm. Xem [docs/README.md](README.md).
+Chưa xây sản phẩm. Có hai loại hoạt động mẫu (`kind-bars`: thanh cắt được + so sánh phân số; `kind-choice`: chọn đáp án) để chứng minh hợp đồng dùng được — chúng không phải định hướng sản phẩm. Xem [docs/README.md](README.md).

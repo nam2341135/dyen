@@ -1,7 +1,7 @@
 //! Kết quả đánh giá một dấu vết (ADR 0010).
 //!
 //! Lõi không biết ý nghĩa của nhãn: mỗi loại hoạt động tự khai báo nhãn nó dùng
-//! ([`crate::Kind::TAGS`]), nội dung đặt tên hiển thị cho nhãn.
+//! ([`crate::Kind::TAGS`], [`crate::Kind::config_tags`]), nội dung đặt tên hiển thị cho nhãn.
 
 use serde::{Deserialize, Serialize};
 
@@ -23,7 +23,7 @@ pub struct Outcome {
 /// Lõi không biết nhãn là điều tốt hay xấu; nhãn và nghĩa của nó do loại hoạt động định nghĩa.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Finding {
-    /// Nhãn (phải nằm trong `Kind::TAGS` của loại hoạt động).
+    /// Nhãn (phải nằm trong `Kind::TAGS` hoặc `Kind::config_tags` của loại hoạt động).
     pub tag: TagId,
     /// `true` nếu dấu hiệu đã xuất hiện rồi người học tự rời khỏi nó trong cùng bài làm.
     pub recovered: bool,
