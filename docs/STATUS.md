@@ -26,7 +26,7 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
   - người duyệt ADR (xem "Chờ người quyết");
   - nếu chấp nhận: sửa ADR 0004 trỏ về ADR 0014, sửa định nghĩa `Attempt` trong glossary, rồi thêm việc "làm lưu bài làm" vào "Tiếp theo".
 
-- **`bars`: khoá thao tác khi phiên kết thúc.** Nhánh `fix/bars-khoa-sau-nop`, tách từ `docs/adr-luu-bai-lam`. Kết thúc = bấm "Xong" hoặc so sánh đúng; so sánh sai vẫn sửa được (giữ điểm một nửa và `recovered`). Các nút bị `disabled`, hình nhận class `locked`, và `Play::act_unless` bỏ qua đầu vào. Có test, đã thử ở 360 px, CI xanh. Còn: commit, PR, người duyệt.
+- **`bars`: khoá thao tác khi phiên kết thúc.** Nhánh `fix/bars-khoa-sau-nop`, PR #8, xếp chồng lên PR #7. Kết thúc = bấm "Xong" hoặc so sánh đúng; so sánh sai vẫn sửa được (giữ điểm một nửa và `recovered`). Các nút bị `disabled`, hình nhận class `locked`, và `Play::act_unless` bỏ qua đầu vào. Có test, đã thử ở 360 px, CI xanh. Còn: người duyệt và merge, sau PR #7.
 
 ## Chờ người quyết
 
