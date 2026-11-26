@@ -28,6 +28,8 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
 - **`bars`: khoá thao tác khi phiên kết thúc.** Nhánh `fix/bars-khoa-sau-nop`, PR #8, xếp chồng lên PR #7. Kết thúc = bấm "Xong" hoặc so sánh đúng; so sánh sai vẫn sửa được (giữ điểm một nửa và `recovered`). Các nút bị `disabled`, hình nhận class `locked`, và `Play::act_unless` bỏ qua đầu vào. Có test, đã thử ở 360 px, CI xanh. Còn: người duyệt và merge, sau PR #7.
 
+- **Ghim Rust 1.100.0** trong `rust-toolchain.toml` (ADR 0007, bổ sung 2026-11-26). Nhánh `ci/ghim-rust`, PR #9, xếp chồng lên PR #8. CI xanh ở máy. Còn: người duyệt và merge, sau PR #8.
+
 ## Chờ người quyết
 
 Việc AI không tự làm được hoặc không được tự quyết.
@@ -48,16 +50,14 @@ Theo thứ tự. "Làm tiếp" mà không có mục dở dang ở "Đang làm" t
 
 1. **Bố cục và giao diện vỏ web.** Gồm trang danh mục, thanh tiêu đề, trang kết quả. Chỉ sửa stylesheet và cấu trúc theo ADR 0013.
    - Xong khi: có bản thiết kế được duyệt, thử ở 360 px.
-2. **Ghim phiên bản Rust chính xác** trong `rust-toolchain.toml`. Đây là nợ ghi ở ADR 0007, đến hạn vì đã có CI.
-   - Xong khi: CI và máy cục bộ dùng cùng một bản, ADR 0007 ghi đã làm.
-3. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
+2. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
    - Xong khi: CI đỏ nếu `web_bg.wasm` sau `wasm-opt` vượt ngưỡng ghi trong `crates/web/README.md`.
 
 ## Nợ đã biết
 
 - `bars` tự do: hai vết cắt người học đặt quá sát nhau cho vùng bấm < 24 px (ghi ở ADR 0013).
 - GitHub Pages chỉ nén gzip, không brotli. Lượng tải thật lớn hơn số đo trong `crates/web/README.md`.
-- `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 3 ở "Tiếp theo").
+- `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 2 ở "Tiếp theo").
 
 ## Đã xong gần đây
 

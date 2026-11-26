@@ -25,4 +25,7 @@ Cần một lệnh duy nhất để người và AI tự kiểm tra trước khi
   - `docs/STATUS.md` có đủ mục;
   - mỗi `kind-*` có README và test hợp đồng.
 
-  Lý do: tài liệu bàn giao cũ đi lặng lẽ thì người đến sau làm theo điều sai. Nợ ghim phiên bản ở trên đã đến hạn, theo dõi ở `docs/STATUS.md`.
+  Lý do: tài liệu bàn giao cũ đi lặng lẽ thì người đến sau làm theo điều sai.
+- **Bổ sung (2026-11-26): đã ghim phiên bản.** `rust-toolchain.toml` ghim `channel = "1.100.0"`, là bản CI và máy cục bộ đang dùng. Nợ "không ghim phiên bản" ở trên đã trả.
+  - Nâng bản là một thay đổi riêng: sửa số, chạy `cargo xtask ci`, ghi lý do trong mô tả PR.
+  - `rust-version` trong `Cargo.toml` vẫn là bản tối thiểu.
