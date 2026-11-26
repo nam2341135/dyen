@@ -19,7 +19,7 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
   - mẫu PR.
 
   CI xanh, PR #5 đang mở (xếp chồng lên PR #4). Còn: người duyệt và merge, sau PR #4.
-- **Nâng `actions/checkout` v4 → v7** (Node 24, hết cảnh báo Node 20). Nhánh `ci/checkout-v7`, xếp chồng lên PR #5. Chọn v7 vì lỗi push từ `git worktree` của v6.0.0 (`pages.yml` dùng) đã sửa ở v6.0.1. Còn:
+- **Nâng `actions/checkout` v4 → v7** (Node 24, hết cảnh báo Node 20). Nhánh `ci/checkout-v7`, PR #6, xếp chồng lên PR #5. Chọn v7 vì lỗi push từ `git worktree` của v6.0.0 (`pages.yml` dùng) đã sửa ở v6.0.1. Còn:
   - người duyệt và merge, sau PR #5;
   - sau khi merge vào `main`: xem lần chạy `pages` đầu tiên đẩy được lên `gh-pages`. PR không chạy được workflow này. Nếu đỏ ở bước "Đẩy lên gh-pages/app" thì đó là credential của checkout; đặt lại `@v4` rồi báo.
 
