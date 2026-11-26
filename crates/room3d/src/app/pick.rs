@@ -11,7 +11,7 @@ use super::{RoomState, send_all};
 #[derive(Component)]
 pub struct SlotTag(pub SlotId);
 
-/// Chỗ chuột đang ở trên (chỉ chuột; chạm dùng "chạm lần một = hover" của `Ctl`).
+/// Vật lối vào chuột đang ở trên (chỉ chuột; chạm dùng "chạm lần một = hover" của `Ctl`).
 #[derive(Resource, Default)]
 pub struct MouseOver(Option<SlotId>);
 
@@ -45,7 +45,8 @@ pub fn pointer(
         if e.pointer.id == PointerId::Mouse
             && let Ok(t) = tags.get(e.entity)
         {
-            cur = Some(t.0);
+            // Đồ trang trí (cốc, cây…) không sáng: như rời mọi vật.
+            cur = Some(t.0).filter(|&id| is_entry(id));
         }
     }
     if cur != mouse.0 {

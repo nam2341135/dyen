@@ -49,7 +49,15 @@ pub fn shell_view(prev: ShellView, msg: &FromRoom) -> ShellView {
             three_d: ThreeD::Off,
             label: None,
         },
-        FromRoom::Open(_) | FromRoom::Arrived(_) => prev,
+        FromRoom::Open(_) | FromRoom::Arrived(_) | FromRoom::Quality(_) => prev,
+    }
+}
+
+/// Mức chất lượng vỏ hiển thị sau `msg`: phòng tự hạ mức (fps thấp) thì theo phòng.
+pub fn quality_after(cur: Quality, msg: &FromRoom) -> Quality {
+    match msg {
+        FromRoom::Quality(q) => *q,
+        _ => cur,
     }
 }
 
@@ -199,11 +207,16 @@ impl Shell {
     pub fn listen(self, route: RwSignal<Route>) {
         room::on_from_room(move |msg| {
             self.view.update(|v| *v = shell_view(v.clone(), &msg));
+            // Không lưu lựa chọn: mức tự hạ chỉ cho lần mở trang này.
+            let q = quality_after(self.quality.get_untracked(), &msg);
+            if q != self.quality.get_untracked() {
+                self.quality.set(q);
+            }
             match msg {
                 FromRoom::Open(z) => self.fire(Ev::Open(z)),
                 FromRoom::Arrived(z) => self.fire(Ev::Arrived(z)),
                 FromRoom::Failed(e) => leptos::logging::warn!("phòng 3D: Failed: {e}"),
-                FromRoom::FirstFrame | FromRoom::Hover(_) => {}
+                FromRoom::FirstFrame | FromRoom::Hover(_) | FromRoom::Quality(_) => {}
             }
         });
         // Bộ nghe sống suốt đời trang; bỏ handle không gỡ bộ nghe.
@@ -290,7 +303,12 @@ pub fn backdrop(shell: Shell, route: RwSignal<Route>) -> impl IntoView {
                 hidden=move || still_broken.get() || ready()
                 on:error=move |_| still_broken.set(true)
             />
-            <canvas id="room3d" class:ready=ready hidden=canvas_hidden></canvas>
+            <canvas
+                id="room3d"
+                class:ready=ready
+                class:thap=move || shell.quality.get() == Quality::Low
+                hidden=canvas_hidden
+            ></canvas>
         </div>
         <Show when=loading>
             <p class="room-loading" role="status">
@@ -410,5 +428,17 @@ mod tests {
         assert_eq!(v.label, None);
         let v = shell_view(v, &FromRoom::Open(Zone::Review));
         assert_eq!(v.three_d, ThreeD::Ready);
+    }
+
+    #[test]
+    fn phong_tu_ha_chat_luong_thi_vo_theo() {
+        let q = quality_after(Quality::High, &FromRoom::FirstFrame);
+        assert_eq!(q, Quality::High);
+        let q = quality_after(q, &FromRoom::Quality(Quality::Low));
+        assert_eq!(q, Quality::Low);
+        let q = quality_after(q, &FromRoom::Hover(None));
+        assert_eq!(q, Quality::Low);
+        let v = shell_view(start(), &FromRoom::Quality(Quality::Low));
+        assert_eq!(v, start());
     }
 }

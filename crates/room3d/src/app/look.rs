@@ -171,7 +171,8 @@ pub fn sky(
 
 /// Mức chất lượng của `Ctl`:
 /// - `High`: bloom nhẹ, MSAA 4×, bóng cho đèn bàn;
-/// - `Low`: không bloom (và không HDR), MSAA tắt, không bóng (độ phân giải giữ nguyên, xem cuối hàm).
+/// - `Low`: không bloom (và không HDR), MSAA tắt, không bóng. Độ phân giải 0,75× do vỏ làm bằng CSS
+///   (lớp `thap` trên canvas), không ở đây.
 pub fn quality(
     room: Res<RoomState>,
     mut last: Local<Option<Quality>>,
@@ -202,6 +203,6 @@ pub fn quality(
     for mut l in &mut lamps {
         l.shadow_maps_enabled = high;
     }
-    // Không hạ độ phân giải: trên web, `scale_factor_override` chỉ đổi kích thước logic; winit
-    // vẫn đặt bộ đệm canvas = kích thước CSS × devicePixelRatio (đã thử: 1600×1000 ở 1280 px).
+    // Độ phân giải không đổi ở đây: trên web `scale_factor_override` không đổi bộ đệm canvas
+    // (winit đặt = cỡ CSS × devicePixelRatio). Vỏ thu nhỏ canvas bằng lớp CSS `thap`.
 }

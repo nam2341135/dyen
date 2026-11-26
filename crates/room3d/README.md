@@ -61,6 +61,8 @@ JSON của `room_model::{ToRoom, FromRoom}`, dạng `{ "t": tên, "v": giá tr�
 - `FirstFrame`: khi đã có `Init` và 2 khung đã vẽ sau đó. Tường, bàn, cửa sổ và 3 lối vào dựng
   ở `Startup`, trước khung đầu (bản thiết kế, quyết định 10). Console in thời điểm khung đầu.
 - Phòng panic: hook gửi `Failed` (vỏ ẩn canvas, hiện danh sách chữ).
+- `Quality(q)`: chỉ khi phòng tự đổi mức (`FpsProbe`); vỏ cập nhật nút chất lượng và lớp
+  `thap`. `SetQuality` của vỏ không được gửi lại.
 - Bàn phím: phòng không nhận phím. `prevent_default_event_handling = false`, cửa sổ không tự
   lấy focus, và `tabindex` winit gắn vào canvas bị bỏ, để Tab/Enter vẫn tới danh sách khu.
 
@@ -82,9 +84,9 @@ Khi `Ctl::suspended()` (vỏ gửi `Suspend` lúc rời phòng):
 | Mức | Bật |
 |---|---|
 | `High` | bloom nhẹ (`Bloom::NATURAL`, cường độ 0,08; cần HDR), MSAA 4×, bóng cho đèn bàn |
-| `Low` | không bloom, không HDR, MSAA tắt, không bóng. Chưa hạ độ phân giải: trên web `scale_factor_override` không đổi bộ đệm canvas (winit đặt lại theo CSS × devicePixelRatio) |
+| `Low` | không bloom, không HDR, MSAA tắt, không bóng. Độ phân giải 0,75×: vỏ gắn lớp `thap` cho canvas (rộng, cao 75%, `transform: scale(1.3333)` từ góc trên trái); winit đặt bộ đệm = cỡ CSS × devicePixelRatio nên bộ đệm nhỏ theo. `scale_factor_override` không dùng được: trên web nó không đổi bộ đệm |
 
-Vỏ chọn mức trong `Init`; `FpsProbe` hạ xuống `Low` một lần nếu 3 s đầu dưới 30 fps.
+Vỏ chọn mức trong `Init`; `FpsProbe` hạ xuống `Low` một lần nếu 3 s đầu dưới 30 fps và gửi `FromRoom::Quality(Low)`.
 
 ## Bảng màu của phòng
 

@@ -265,5 +265,7 @@ fn first_frame(mut room: ResMut<RoomState>, time: Res<Time>) {
         let now = time.elapsed_secs();
         let out = room.ctl.on_msg(&ToRoom::SetQuality(Quality::Low), now);
         send_all(out);
+        // Vỏ cập nhật nút chất lượng và lớp `thap`; chỉ gửi khi phòng tự đổi, không dội lại `SetQuality`.
+        send(&FromRoom::Quality(Quality::Low));
     }
 }

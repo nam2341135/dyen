@@ -233,6 +233,8 @@ pub enum FromRoom {
     Arrived(Zone),
     /// Phòng gặp lỗi.
     Failed(String),
+    /// Phòng tự đổi mức chất lượng (fps thấp); không gửi lại khi vỏ yêu cầu `SetQuality`.
+    Quality(Quality),
 }
 
 #[cfg(test)]
@@ -291,6 +293,7 @@ mod tests {
             FromRoom::Open(Zone::Review),
             FromRoom::Arrived(Zone::Courses),
             FromRoom::Failed("x".into()),
+            FromRoom::Quality(Quality::Low),
         ];
         for m in from {
             let s = serde_json::to_string(&m).unwrap();

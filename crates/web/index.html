@@ -80,6 +80,9 @@
   .room [hidden]{display:none}
   .room canvas{opacity:0;transition:opacity .4s}
   .room canvas.ready{opacity:1}
+  /* Chất lượng thấp: canvas nhỏ 75% (bộ đệm = cỡ CSS × DPR) rồi phóng lại đầy màn.
+     !important vì Bevy (fit_canvas_to_parent) gắn style nội tuyến width/height: 100%. */
+  .room canvas.thap{width:75%!important;height:75%!important;transform:scale(1.3333);transform-origin:0 0}
   .room-loading,.room-label{position:fixed;left:50%;transform:translateX(-50%);z-index:1;margin:0;padding:4px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);white-space:nowrap}
   .room-loading{bottom:16px;color:var(--muted);font-size:14px}
   .room-label{bottom:76px;font-weight:600;pointer-events:none}
