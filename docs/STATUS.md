@@ -22,7 +22,7 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 - **Nâng `actions/checkout` v4 → v7** (Node 24, hết cảnh báo Node 20). Nhánh `ci/checkout-v7`, PR #6, xếp chồng lên PR #5. Chọn v7 vì lỗi push từ `git worktree` của v6.0.0 (`pages.yml` dùng) đã sửa ở v6.0.1. Còn:
   - người duyệt và merge, sau PR #5;
   - sau khi merge vào `main`: xem lần chạy `pages` đầu tiên đẩy được lên `gh-pages`. PR không chạy được workflow này. Nếu đỏ ở bước "Đẩy lên gh-pages/app" thì đó là credential của checkout; đặt lại `@v4` rồi báo.
-- **ADR 0014, lưu bài làm cục bộ** (trạng thái "Đề xuất"). Nhánh `docs/adr-luu-bai-lam`, tách từ `ci/checkout-v7`. Chỉ có tài liệu, chưa có code. Còn:
+- **ADR 0014, lưu bài làm cục bộ** (trạng thái "Đề xuất"). Nhánh `docs/adr-luu-bai-lam`, PR #7, xếp chồng lên PR #6. Chỉ có tài liệu, chưa có code. Còn:
   - người duyệt ADR (xem "Chờ người quyết");
   - nếu chấp nhận: sửa ADR 0004 trỏ về ADR 0014, sửa định nghĩa `Attempt` trong glossary, rồi thêm việc "làm lưu bài làm" vào "Tiếp theo".
 
