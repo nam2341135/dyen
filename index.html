@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>dyen — spike đo trên điện thoại</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:640px;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#222}
+  a.card{display:block;border:1px solid #ccd;border-radius:10px;padding:1rem;margin:1rem 0;text-decoration:none;color:inherit}
+  a.card:hover{background:#f4f6fa}
+  code{background:#eef;padding:0 .3em;border-radius:4px}
+</style>
+<h1>dyen — spike đo trên điện thoại</h1>
+<p>Trang thử nghiệm để đo điều kiện 2 của ADR 0008: thời gian từ lúc tải tới khung hình 3D đầu tiên trên điện thoại Android 3–4 GB RAM qua 4G (ngưỡng ≤ 10 giây).</p>
+<a class="card" href="leptos-bevy/"><b>1. Leptos + Bevy (cảnh tối thiểu)</b><br>
+Vỏ 2D Leptos, bấm “Hiển thị 3D” để nạp Bevy. Dòng chữ đầu trang ghi thời gian khởi tạo wasm và khung 3D đầu tiên.</a>
+<a class="card" href="lang-map/"><b>2. Chiều về trên làng ven sông (cảnh đầy đủ)</b><br>
+Cảnh làng 3D dựng bằng code. Góc trên trái ghi thời gian tải, khung đầu và FPS; nút “Chất lượng” bật/tắt bloom, khử răng cưa, bóng.</a>
+<h2>Cách đo</h2>
+<ol>
+  <li>Tắt Wi-Fi, dùng 4G. Mở trang ở tab ẩn danh (để không có bộ nhớ đệm).</li>
+  <li>Đếm từ lúc bấm link tới khi thấy cảnh 3D, và ghi lại các số trên trang.</li>
+  <li>Với cảnh làng: ghi FPS sau khi bỏ mở đầu, ở chất lượng cao và thấp.</li>
+</ol>
+<p>Không thu thập dữ liệu nào; trang không có analytics.</p>

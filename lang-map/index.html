@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Chiều về trên làng ven sông</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a2030;overflow:hidden;font-family:system-ui,sans-serif}
+  #bevy{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+  #hud{position:fixed;left:12px;top:10px;color:#fff;font-size:13px;text-shadow:0 1px 3px #000a;pointer-events:none;line-height:1.5}
+  #title{font-size:18px;font-weight:600;letter-spacing:.02em}
+  #bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  #bar button{background:#0006;color:#fff;border:1px solid #fff4;border-radius:16px;padding:7px 13px;font-size:13px;cursor:pointer;backdrop-filter:blur(4px)}
+  #bar button:hover{background:#0009}
+  #load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;background:#1a2030;transition:opacity 1.2s}
+</style>
+<canvas id="bevy"></canvas>
+<div id="hud"><div id="title">Chiều về trên làng ven sông</div><div id="stat"></div><div id="timing"></div></div>
+<div id="bar">
+  <button data-h="12">Trưa</button>
+  <button data-h="17.3">Hoàng hôn</button>
+  <button data-h="21.5">Đêm</button>
+  <button data-h="5.9">Bình minh</button>
+  <button id="fast">Tua nhanh</button>
+  <button id="q">Chất lượng</button>
+  <button id="skip">Bỏ mở đầu</button>
+</div>
+<div id="load">Đang dựng làng…</div>
+<script type="module">
+  // Đo thời gian CPU mỗi khung (Bevy cập nhật + gửi lệnh vẽ trong callback rAF),
+  // không phụ thuộc việc trình duyệt hãm tốc độ khi khung bị che.
+  const raf = window.requestAnimationFrame.bind(window);
+  window.dyenWork = [];
+  window.requestAnimationFrame = (cb) => raf((t) => {
+    const s = performance.now();
+    cb(t);
+    const d = performance.now() - s;
+    if (d > 0.5) { dyenWork.push(d); if (dyenWork.length > 60) dyenWork.shift(); }
+  });
+  window.dyenWorkMs = () => { const a = [...dyenWork].sort((x, y) => x - y); return a.length ? +a[a.length >> 1].toFixed(1) : null; };
+  const t0 = performance.now();
+  const timing = document.getElementById("timing");
+  const parts = [];
+  const log = (s) => { console.log(s); parts.push(s); timing.textContent = parts.join(" · "); };
+  window.dyenHud = (s) => { document.getElementById("stat").textContent = s; };
+  let tStart = 0;
+  window.dyenFirstFrame = () => {
+    log(`khung đầu ${Math.round(performance.now() - tStart)} ms sau start`);
+    log(`tổng ${Math.round(performance.now() - t0)} ms từ lúc mở trang`);
+    const l = document.getElementById("load");
+    l.style.opacity = 0;
+    setTimeout(() => l.remove(), 1300);
+  };
+  const m = await import("./lang_map.js");
+  await m.default();
+  log(`tải + khởi tạo wasm ${Math.round(performance.now() - t0)} ms`);
+  for (const b of document.querySelectorAll("[data-h]")) b.onclick = () => m.set_hour(parseFloat(b.dataset.h));
+  document.getElementById("fast").onclick = () => m.toggle_fast();
+  document.getElementById("q").onclick = () => m.toggle_quality();
+  document.getElementById("skip").onclick = () => m.skip_intro();
+  window.dyenMod = m;
+  tStart = performance.now();
+  try { m.start(); } catch (e) { if (!String(e).includes("Using exceptions for control flow")) throw e; }
+</script>
