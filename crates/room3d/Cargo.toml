@@ -9,3 +9,42 @@ publish.workspace = true
 
 [lints]
 workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+room-model.workspace = true
+serde_json.workspace = true
+# Native chỉ cần `bevy::math` cho test; wasm thêm bộ vẽ ở bên dưới.
+bevy = { version = "=0.20.1", default-features = false, features = ["std"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
+bevy = { version = "=0.20.1", default-features = false, features = [
+    "std",
+    "async_executor",
+    "bevy_asset",
+    "bevy_log",
+    "bevy_winit",
+    "bevy_window",
+    "webgl2",
+    "web",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_pbr",
+    "bevy_light",
+    "bevy_camera",
+    "bevy_mesh",
+    "bevy_material",
+    "bevy_shader",
+    "bevy_color",
+    "bevy_picking",
+    "mesh_picking",
+    "mouse",
+    "touch",
+    "bevy_gltf",
+    "bevy_animation",
+    "bevy_scene",
+    "bevy_post_process",
+] }

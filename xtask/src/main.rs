@@ -41,13 +41,25 @@ fn main() -> ExitCode {
 }
 
 fn ci() -> bool {
-    let steps: [(&str, &dyn Fn() -> bool); 5] = [
+    let steps: [(&str, &dyn Fn() -> bool); 6] = [
         ("fmt", &|| cargo(&["fmt", "--all", "--check"])),
         ("clippy", &|| {
             cargo(&[
                 "clippy",
                 "--workspace",
                 "--all-targets",
+                "--",
+                "-D",
+                "warnings",
+            ])
+        }),
+        ("clippy-room3d", &|| {
+            cargo(&[
+                "clippy",
+                "-p",
+                "room3d",
+                "--target",
+                "wasm32-unknown-unknown",
                 "--",
                 "-D",
                 "warnings",
