@@ -49,7 +49,7 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
   - bản thiết kế, đã được chủ dự án duyệt: [`docs/superpowers/specs/2026-11-27-phong-hoc-3d-design.md`](superpowers/specs/2026-11-27-phong-hoc-3d-design.md);
   - kế hoạch 8 task: [`docs/superpowers/plans/2026-11-27-phong-hoc-3d.md`](superpowers/plans/2026-11-27-phong-hoc-3d.md).
 
-  Còn: chủ dự án duyệt kế hoạch và chọn cách thực hiện; rồi làm từ Task 1 trên nhánh `feat/phong-hoc-3d`. Task 7 phải hỏi trước khi tải mô hình CC0.
+  Đang làm trên nhánh `feat/phong-hoc-3d`: Task 1–7 đã commit (Task 7: mô hình CC0 trong `crates/room3d/assets/`, nguồn ở `assets/NGUON.md`; bảng màu; mèo; tường có chủ đích). Còn: Task 8, rồi PR.
 
 ## Chờ người quyết
 

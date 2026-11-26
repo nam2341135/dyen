@@ -3,8 +3,12 @@
 //! Mọi quyết định nằm ở [`Ctl`]; ở đây chỉ chuyển đầu vào (thông điệp, chuột/chạm, đồng hồ
 //! `Time::elapsed_secs`) vào `Ctl` và vẽ theo những gì nó trả ra.
 
+mod ambient;
 mod look;
+mod models;
+mod pet;
 mod pick;
+mod props;
 mod scene;
 
 use std::cell::RefCell;
@@ -96,7 +100,8 @@ pub fn start() {
         })
         .insert_resource(RoomState::new())
         .init_resource::<pick::MouseOver>()
-        .add_systems(Startup, (scene::spawn, hook_up))
+        .add_observer(models::restyle)
+        .add_systems(Startup, (scene::spawn, pet::spawn, hook_up))
         .add_systems(
             Update,
             (
@@ -107,6 +112,9 @@ pub fn start() {
                 look::highlight,
                 look::sky,
                 look::quality,
+                ambient::add_steam,
+                ambient::animate,
+                pet::tick,
                 pick::cursor,
                 suspend,
                 first_frame,
@@ -235,10 +243,25 @@ fn suspend(
     }
 }
 
-/// Báo `FirstFrame` sau 2 khung đã vẽ kể từ khi có `Init` (tường, bàn, cửa sổ và ba lối vào
-/// dựng ở `Startup`, trước đó). Sau đó đo fps 3 s, bỏ qua lúc tạm dừng; chậm thì hạ chất lượng.
-fn first_frame(mut room: ResMut<RoomState>, time: Res<Time>) {
+/// Báo `FirstFrame` khi đã có `Init`, các mô hình khung đầu phải chờ (bàn, máy tính; tường,
+/// cửa sổ, vở, cúp dựng bằng hình khối ở `Startup`) đã nạp xong, và 2 khung đã vẽ sau đó.
+/// Mô hình chờ nạp hỏng thì báo `Failed` (vỏ hiện danh sách chữ). Sau `FirstFrame` đo fps 3 s,
+/// bỏ qua lúc tạm dừng; chậm thì hạ chất lượng.
+fn first_frame(
+    mut room: ResMut<RoomState>,
+    time: Res<Time>,
+    pending: Query<&WorldAssetRoot, With<models::Pending>>,
+    assets: Res<AssetServer>,
+    mut failed: Local<bool>,
+) {
     if !room.inited || room.ctl.suspended() {
+        return;
+    }
+    if !pending.is_empty() {
+        if !*failed && pending.iter().any(|r| assets.load_state(&r.0).is_failed()) {
+            *failed = true;
+            send(&FromRoom::Failed("room3d: không nạp được mô hình".into()));
+        }
         return;
     }
     if !room.first_sent {

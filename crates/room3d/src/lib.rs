@@ -5,6 +5,9 @@ pub mod ctl;
 pub mod flight;
 pub mod fps;
 pub mod inbox;
+pub mod palette;
+pub mod pet_clock;
+pub mod pixfont;
 pub mod poses;
 pub mod sky;
 

@@ -15,7 +15,7 @@ out="$root/target/wasm32-unknown-unknown/$profile/room3d.wasm"
 dist="$root/crates/web/dist/room"
 rm -rf "$dist" && mkdir -p "$dist"
 wasm-bindgen --target web --no-typescript --out-name room3d --out-dir "$dist" "$out"
-for f in "$here"/assets/*.glb; do
+for f in "$here"/assets/*.glb "$here"/assets/*.png; do
   [ -e "$f" ] && cp "$f" "$dist/"
 done
 size() { stat -c %s "$1"; }

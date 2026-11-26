@@ -47,6 +47,8 @@ bevy = { version = "=0.20.1", default-features = false, features = [
     "touch",
     "bevy_gltf",
     "bevy_animation",
+    "gltf_animation",
+    "reflect_auto_register",
     "bevy_scene",
     "bevy_post_process",
 ] }

@@ -6,6 +6,7 @@ use bevy::prelude::*;
 use room_model::{Quality, SlotId};
 
 use super::RoomState;
+use super::models::Glow;
 use crate::sky::{SkyState, sky_at};
 
 /// Nâng vật đang sáng lên 1,5 cm.
@@ -31,7 +32,7 @@ pub struct SkyPane {
     pub top: bool,
 }
 
-/// Một ngôi sao (hiện về đêm).
+/// Một ngôi sao hoặc đèn thành phố xa sau cửa sổ (hiện về đêm).
 #[derive(Component)]
 pub struct Star;
 
@@ -43,22 +44,19 @@ pub struct SunLight;
 #[derive(Component)]
 pub struct DeskLampLight;
 
-/// Làm sáng chỗ `Ctl::highlighted`: nâng 1,5 cm và tăng `emissive`; trả chỗ cũ về như trước.
+/// Làm sáng chỗ `Ctl::highlighted`: nâng 1,5 cm và tăng `emissive` trên mọi vật liệu riêng
+/// của vật đó (`Glow`); trả chỗ cũ về như trước.
 pub fn highlight(
     room: Res<RoomState>,
     mut last: Local<Option<SlotId>>,
-    mut q: Query<(
-        &SlotVisual,
-        &mut Transform,
-        &MeshMaterial3d<StandardMaterial>,
-    )>,
+    mut q: Query<(&SlotVisual, &mut Transform, &Glow)>,
     mut mats: ResMut<Assets<StandardMaterial>>,
 ) {
     let now = room.ctl.highlighted();
     if *last == now {
         return;
     }
-    for (v, mut t, m) in &mut q {
+    for (v, mut t, g) in &mut q {
         let on = Some(v.id) == now;
         if !on && Some(v.id) != *last {
             continue;
@@ -67,8 +65,10 @@ pub fn highlight(
         if on {
             t.translation.y += LIFT;
         }
-        if let Some(mut mat) = mats.get_mut(&m.0) {
-            mat.emissive = if on { v.glow } else { LinearRgba::BLACK };
+        for h in &g.0 {
+            if let Some(mut mat) = mats.get_mut(h) {
+                mat.emissive = if on { v.glow } else { LinearRgba::BLACK };
+            }
         }
     }
     *last = now;
@@ -155,10 +155,16 @@ pub fn sky(
             mat.base_color = linear(if p.top { s.top } else { s.bottom });
         }
     }
-    if let Some(m) = stars.iter().next()
-        && let Some(mut mat) = mats.get_mut(&m.0)
-    {
-        mat.base_color.set_alpha(s.stars);
+    // Sao và đèn thành phố dùng chung vài vật liệu; mỗi vật liệu đặt một lần.
+    let mut seen: Vec<AssetId<StandardMaterial>> = Vec::new();
+    for m in &stars {
+        if seen.contains(&m.0.id()) {
+            continue;
+        }
+        seen.push(m.0.id());
+        if let Some(mut mat) = mats.get_mut(&m.0) {
+            mat.base_color.set_alpha(s.stars);
+        }
     }
     for mut l in &mut sun {
         l.color = linear(s.sun_color);
