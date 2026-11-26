@@ -1,7 +1,8 @@
 # ADR 0008: Leptos cho giao diện, Bevy cho 3D, Axum cho server
 
-- **Trạng thái:** **Đề xuất — 3/4 điều kiện đạt, chờ đo trên điện thoại (điều kiện 2)**
+- **Trạng thái:** **Chấp nhận** cho Leptos và Bevy (2026-11-26). Axum, sqlx và PostgreSQL vẫn là đề xuất, quyết khi có crate `server`.
 - **Ngày:** 2026-11-26
+- **Việc còn nợ:** đo điều kiện 2 trên Android 3–4 GB qua 4G khi có máy. Nếu vượt 10 s, xem lại theo "Phương án dự phòng".
 
 ## Bối cảnh
 
@@ -29,7 +30,7 @@ Máy đo: Windows 11, Intel Iris Xe, Chrome (WebGL2 qua ANGLE/D3D11). Build: `op
 | # | Điều kiện | Kết quả | Đạt? |
 |---|---|---|---|
 | 1 | Gói Bevy tối thiểu ≤ 5 MB nén | [`spikes/bevy-min`](../../spikes/bevy-min): wasm 16,7 MB → 14,2 MB sau `-Oz` → **2,89 MB brotli** (+ 12 KB JS) | ✓ |
-| 2 | Khung 3D đầu ≤ 10 s, Android 3–4 GB, 4G | Chưa đo trên điện thoại. Trên máy đo (localhost): tải + khởi tạo wasm 67 ms, khung đầu 343 ms sau khi bật 3D. Ước lượng tải 2,9 MB qua 4G ~10 Mbit/s ≈ 2,5 s | **chờ** |
+| 2 | Khung 3D đầu ≤ 10 s, Android 3–4 GB, 4G | **iPhone 12 (4 GB), mạng di động 5G sóng yếu, tắt Wi-Fi, qua GitHub Pages (gzip 4,4 MB):** vỏ 2D 932 ms, tải + khởi tạo wasm 6 675 ms, **khung 3D đầu 7 001 ms** sau khi bật. Cùng máy qua Wi-Fi: 2 410 ms. Chưa đo Android (không có máy) | ✓ trên iOS (chấp nhận khi chưa có Android, xem "Việc còn nợ") |
 | 3 | Leptos + Bevy cùng trang, hai chiều, đổi 2D/3D không mất trạng thái | [`spikes/leptos-bevy`](../../spikes/leptos-bevy): vỏ Leptos giữ `Session<Bars>`; Bevy nạp lười bằng `import()` khi bật 3D, nhận `State` (JSON), phát `Input` (JSON) khi bấm mảnh. Đã thử: thao tác 2D → 3D vẽ đúng; bấm trong 3D → `Session::act` chấp nhận; tắt 3D, thao tác 2D, bật lại → 3D đúng trạng thái, không khởi tạo lại; chấm 1000/1000 | ✓ |
 | 4 | Phiên bản + WebGL2/WebGPU | WebGL2: Safari iOS 15+ và Chrome Android đều có — dùng làm nền. WebGPU: Safari 26 (iOS 26, 9/2025) bật mặc định, iOS cũ hơn không có; Chrome Android 121+ trên Android 12+ với GPU Qualcomm/ARM. → giữ WebGL2 làm mặc định, WebGPU là nâng cấp sau (Bevy cần build riêng cho mỗi backend) | ✓ |
 
@@ -65,8 +66,13 @@ Phục vụ `dist/` qua HTTPS hoặc mạng LAN (vd. `python -m http.server -d d
 **Bản đã đưa lên mạng:** <https://nam2341135.github.io/dyen/>. Đây là GitHub Pages, nhánh `gh-pages`, chứa bản build release dựng sẵn trên máy (không build bằng CI). Trang gồm cả `leptos-bevy` và `lang-map`, kèm hướng dẫn đo.
 
 - GitHub Pages chỉ nén **gzip**, không gửi brotli. Lượng tải thật lớn hơn số brotli ở trên khoảng 1,5 lần: `view3d` 4,4 MB (brotli 2,9 MB), `lang-map` 4,9 MB (brotli 3,1 MB), vỏ Leptos 0,1 MB. Vì vậy số đo qua Pages là trường hợp xấu hơn sản phẩm (sản phẩm sẽ phục vụ brotli). Nếu số này đạt ngưỡng thì điều kiện 2 đạt.
+- Đo trên điện thoại (2026-11-26), iPhone 12 4 GB, Chrome iOS (WebKit), tab ẩn danh: qua mạng di động `leptos-bevy` khung đầu 7,0 s; qua Wi-Fi 2,4 s. Băng thông hiệu dụng ước ~5 Mbit/s (4,4 MB trong ~6,7 s), tương đương 4G thường. Khi phục vụ brotli (2,9 MB), ước lượng ~4,6 s. Cảnh vẽ đúng; canvas tràn mép phải trên màn hình hẹp (lỗi bố cục trang spike).
 - Đo thử trên máy đo qua Internet (2026-11-26): `leptos-bevy` 3,7 s từ lúc bật 3D tới khung đầu; `lang-map` 2,5 s từ lúc mở trang, 37 fps.
 - Sửa spike thì phải build lại và đẩy lại nhánh `gh-pages`.
+
+## Quyết định
+
+Chấp nhận Leptos (vỏ, 2D) và Bevy (3D, gói wasm riêng, nạp lười, WebGL2) dựa trên kết quả spike: 4/4 điều kiện đạt, trong đó điều kiện 2 mới đo trên iPhone 12 (7,0 s qua mạng di động, ngưỡng 10 s). Chấp nhận khi chưa đo Android vì còn dư 3 s và sản phẩm sẽ phục vụ brotli (gói nhỏ hơn khoảng 1,5 lần so với gzip khi đo).
 
 ## Phương án dự phòng
 
