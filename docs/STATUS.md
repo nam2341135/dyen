@@ -28,7 +28,7 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
 - **`bars`: khoá thao tác khi phiên kết thúc.** Nhánh `fix/bars-khoa-sau-nop`, PR #8, xếp chồng lên PR #7. Kết thúc = bấm "Xong" hoặc so sánh đúng; so sánh sai vẫn sửa được (giữ điểm một nửa và `recovered`). Các nút bị `disabled`, hình nhận class `locked`, và `Play::act_unless` bỏ qua đầu vào. Có test, đã thử ở 360 px, CI xanh. Còn: người duyệt và merge, sau PR #7.
 
-- **Ghim Rust 1.100.0** trong `rust-toolchain.toml` (ADR 0007, bổ sung 2026-11-26). Nhánh `ci/ghim-rust`, tách từ `fix/bars-khoa-sau-nop`. CI xanh ở máy. Còn: commit, PR, người duyệt.
+- **Ghim Rust 1.100.0** trong `rust-toolchain.toml` (ADR 0007, bổ sung 2026-11-26). Nhánh `ci/ghim-rust`, PR #9, xếp chồng lên PR #8. CI xanh ở máy. Còn: người duyệt và merge, sau PR #8.
 
 ## Chờ người quyết
 
