@@ -30,12 +30,12 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
 - **Ghim Rust 1.100.0** trong `rust-toolchain.toml` (ADR 0007, bổ sung 2026-11-26). Nhánh `ci/ghim-rust`, PR #9, xếp chồng lên PR #8. CI xanh ở máy. Còn: người duyệt và merge, sau PR #8.
 
-- **Bố cục vỏ web.** Nhánh `feat/bo-cuc-vo-web`, tách từ `ci/ghim-rust`. Người dùng bảo "cứ làm đi" nên làm thẳng, không qua bản phác. Đã xong:
+- **Bố cục vỏ web.** Nhánh `feat/bo-cuc-vo-web`, PR #10, xếp chồng lên PR #9. Người dùng bảo "cứ làm đi" nên làm thẳng, không qua bản phác. Đã xong:
   - thanh tiêu đề dính trên cùng, có nút "←" về danh mục (44 px);
   - danh mục dạng thẻ: số thứ tự trong gói, tiêu đề, đề bài cắt còn hai dòng;
   - khối kết quả: dấu ✓/!, "Đã đạt"/"Chưa đạt", điểm bên phải, mục "Nhận xét" chỉ hiện khi có phát hiện.
 
-  Đã thử ở 360 px, CI xanh. Còn: commit, PR, người duyệt giao diện.
+  Đã thử ở 360 px, CI xanh. Còn: người duyệt giao diện và merge, sau PR #9.
 
 ## Chờ người quyết
 
