@@ -63,6 +63,22 @@ pub fn sites() -> impl Iterator<Item = &'static str> {
         .chain(EDGES.iter().map(|(k, _, _)| *k))
 }
 
+/// Tọa độ của mọi vị trí theo thứ tự [`sites`]: đỉnh là chính nó, cạnh là trung điểm.
+/// Dùng để vẽ chỗ bấm; không dùng cho đánh giá.
+pub fn site_points() -> Result<Vec<(&'static str, Vec3)>, ExactError> {
+    let half = Rational::new(1, 2)?;
+    let vertices = (0..VERTICES.len()).map(|i| Ok((VERTICES[i].0, vertex(i))));
+    let edges = EDGES
+        .iter()
+        .map(|&(k, a, b)| Ok((k, vertex(a).lerp(vertex(b), half)?)));
+    vertices.chain(edges).collect()
+}
+
+/// Các cạnh của lập phương: khóa, đỉnh đầu, đỉnh cuối (theo thứ tự chuẩn).
+pub fn edge_ends() -> impl Iterator<Item = (&'static str, Vec3, Vec3)> {
+    EDGES.iter().map(|&(k, a, b)| (k, vertex(a), vertex(b)))
+}
+
 fn site_index(key: &str) -> Option<usize> {
     sites().position(|k| k == key)
 }
@@ -442,6 +458,26 @@ impl Kind for Section {
 mod tests {
     use super::*;
     use kernel::{Actor, Session, run};
+
+    #[test]
+    fn site_points_du_20_vi_tri() {
+        let points = site_points().expect("lập phương đơn vị không tràn số");
+        assert_eq!(points.len(), 20);
+        assert!(points.iter().map(|(k, _)| *k).eq(sites()));
+        let half: Rational = "1/2".parse().unwrap();
+        let bc = points.iter().find(|(k, _)| *k == "bc").unwrap().1;
+        assert_eq!(bc, Vec3::new(Rational::ONE, half, Rational::ZERO));
+        let c1 = points.iter().find(|(k, _)| *k == "c1").unwrap().1;
+        assert_eq!(c1, Vec3::int(1, 1, 1));
+    }
+
+    #[test]
+    fn edge_ends_du_12_canh() {
+        let edges: Vec<_> = edge_ends().collect();
+        assert_eq!(edges.len(), 12);
+        assert_eq!(edges[0], ("ab", Vec3::int(0, 0, 0), Vec3::int(1, 0, 0)));
+        assert_eq!(edges[11], ("dd1", Vec3::int(0, 1, 0), Vec3::int(0, 1, 1)));
+    }
 
     fn pt(edge: &str, at: &str) -> EdgePoint {
         EdgePoint {

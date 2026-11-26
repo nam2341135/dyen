@@ -23,7 +23,7 @@ Trang này chỉ chứa thuật ngữ **chung**, không thuộc ý tưởng sư 
 | Phát hiện | `Finding` | Một điều rút ra từ dấu vết: nhãn, đã tự vượt qua chưa (`recovered`), mức tin cậy, chỉ số bước làm bằng chứng. |
 | Nhãn | `Tag` / `TagId` | Mã tự do gắn vào phát hiện và hoạt động (vd. `frac.equal-parts`). Lõi không gán nghĩa; tên hiển thị ở `content/tags.toml`. |
 | Hợp đồng | `contract` | Các tính chất mọi loại hoạt động phải thỏa; kiểm bằng `kernel::contract::check`. |
-| Sổ đăng ký | `registry` | Danh sách đóng các loại hoạt động; chỗ duy nhất rẽ nhánh theo loại. |
+| Sổ đăng ký | `registry` | Danh sách đóng các loại hoạt động; chỗ duy nhất rẽ nhánh theo loại ở tầng logic (vỏ `web` có một `match` đóng chọn bộ hiển thị, ADR 0010). |
 
 ## Nội dung
 

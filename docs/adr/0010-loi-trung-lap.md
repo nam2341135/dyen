@@ -32,7 +32,8 @@ Lõi còn có: `Trace`, `Entry { at_ms, actor, input }`, `replay`, `run`, `Sessi
 ### Sổ đăng ký (`registry`)
 
 - Enum đóng `AnyConfig` (gắn thẻ `kind`) với một biến thể mỗi loại; hàm `run` đọc dấu vết theo đúng kiểu đầu vào của loại, phát lại và đánh giá.
-- Đây là chỗ duy nhất `match` theo loại. Thêm loại: một biến thể + vài dòng `match` mà trình biên dịch chỉ ra.
+- Đây là chỗ duy nhất `match` theo loại **ở tầng logic**. Thêm loại: một biến thể + vài dòng `match` mà trình biên dịch chỉ ra.
+- Sửa đổi 2026-11-26: vỏ `web` có thêm một `match` đóng trên `AnyConfig`, chỉ để chọn bộ hiển thị 2D của loại (bộ hiển thị nằm trong `web/src/kinds/<tên>.rs`). Thêm loại thì trình biên dịch chỉ ra cả chỗ này. Đã cân nhắc tách mỗi bộ hiển thị thành crate `view-<tên>`; bỏ vì gấp đôi số crate mà chưa có ca dùng thứ hai.
 - Không hệ plugin động, không đăng ký lúc chạy.
 
 ### Nội dung
@@ -49,4 +50,4 @@ Lõi còn có: `Trace`, `Entry { at_ms, actor, input }`, `replay`, `run`, `Sessi
 - Thay ý tưởng không chạm lõi. Ý tưởng mới cần thứ lõi chưa có (vd. đánh giá cần dữ liệu ngoài dấu vết) → sửa `kernel` có chủ đích, kèm ADR.
 - Lõi không có "khái niệm", "tiến độ theo khái niệm", "đồ thị kiến thức". Nếu sau này cần, đó là một quyết định riêng xây trên `TagId`.
 - Mỗi loại tự công bố nhãn; `dyen check` bắt nhãn thiếu tên hiển thị.
-- `content` và `cli` không biết loại nào; chúng đi qua `registry`.
+- `content` và `cli` không biết loại nào; chúng đi qua `registry`. `web` biết từng loại, nhưng chỉ để vẽ.
