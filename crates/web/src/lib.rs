@@ -26,11 +26,21 @@ pub fn App() -> impl IntoView {
     };
     let current = RwSignal::new(None::<ActivityId>);
     let screen = move || match current.get().and_then(|id| lib.activities().get(&id)) {
-        Some(a) => activity::view(a, current).into_any(),
+        Some(a) => activity::view(a).into_any(),
         None => catalog::view(lib, current).into_any(),
     };
+    // Đang làm một hoạt động thì thanh tiêu đề có nút về danh mục (vùng bấm 44 px, ADR 0013).
+    let back = move || {
+        current.with(Option::is_some).then(|| {
+            view! {
+                <button class="back" aria-label="Về danh mục" on:click=move |_| current.set(None)>
+                    "←"
+                </button>
+            }
+        })
+    };
     view! {
-        <header><h1>"dyen"</h1></header>
+        <header>{back}<h1>"dyen"</h1></header>
         <main>{screen}</main>
     }
     .into_any()
