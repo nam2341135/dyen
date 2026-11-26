@@ -30,8 +30,8 @@ pub fn groups(lib: &Library) -> Vec<(String, Vec<ActivityId>)> {
 }
 
 /// Vẽ danh mục: mỗi hoạt động là một thẻ có số thứ tự trong gói, tiêu đề và đề bài
-/// (cắt còn hai dòng). Bấm thẻ thì đặt `current`.
-pub fn view(lib: &'static Library, current: RwSignal<Option<ActivityId>>) -> impl IntoView {
+/// (cắt còn hai dòng). Bấm thẻ thì gọi `on_pick`.
+pub fn view(lib: &'static Library, on_pick: impl Fn(ActivityId) + Copy + 'static) -> impl IntoView {
     groups(lib)
         .into_iter()
         .map(|(title, ids)| {
@@ -43,7 +43,7 @@ pub fn view(lib: &'static Library, current: RwSignal<Option<ActivityId>>) -> imp
                     let id = a.id.clone();
                     view! {
                         <li>
-                            <button class="card" on:click=move |_| current.set(Some(id.clone()))>
+                            <button class="card" on:click=move |_| on_pick(id.clone())>
                                 <span class="num" aria-hidden="true">{n}</span>
                                 <span class="card-text">
                                     <strong>{a.title.clone()}</strong>

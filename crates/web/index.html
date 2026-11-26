@@ -52,6 +52,13 @@
   .card-text{min-width:0}
   .card-text strong{display:block}
   .card-sub{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:14px}
+  .zones ul{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:8px}
+  .zones ul[hidden]{display:none}
+  .zones button.zone{width:100%;text-align:left}
+  .zones .zones-toggle{display:none}
+  .zones.collapsed{position:fixed;left:16px;bottom:16px;z-index:1;margin:0}
+  .zones.collapsed .zones-toggle{display:block;background:var(--surface)}
+  .soon{color:var(--muted);font-size:18px}
   .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
   .choices{display:flex;flex-direction:column;gap:8px;margin:8px 0}
   .choice{text-align:left}

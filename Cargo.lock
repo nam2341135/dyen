@@ -1796,6 +1796,7 @@ name = "web"
 version = "0.0.0"
 dependencies = [
  "content",
+ "js-sys",
  "kernel",
  "kind-bars",
  "kind-choice",
@@ -1803,6 +1804,7 @@ dependencies = [
  "leptos",
  "lib-exact",
  "registry",
+ "room-model",
  "wasm-bindgen",
  "web-sys",
 ]
