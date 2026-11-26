@@ -4,7 +4,7 @@ File này trả lời ba câu: đang làm gì, ai cần quyết gì, làm gì ti
 
 **Giai đoạn:** nền móng. Đã có lõi trung lập, ba loại hoạt động (`bars`, `choice`, `section`) và vỏ web tối thiểu chạy ở <https://nam2341135.github.io/dyen/app/>.
 
-**Cập nhật lần cuối:** 2026-11-26.
+**Cập nhật lần cuối:** 2026-11-27.
 
 ## Đang làm
 
@@ -45,11 +45,19 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
   Đã thử ở 360 px, sáng và tối. Còn: người duyệt giao diện; chấp nhận ADR 0015; merge sau PR #10.
 
-- **Trang chủ là phòng học 3D, mốc 1 (phòng + điều hướng).** Nhánh `docs/phong-hoc-3d`, chưa commit. Đã xong:
-  - bản thiết kế, đã được chủ dự án duyệt: [`docs/superpowers/specs/2026-11-27-phong-hoc-3d-design.md`](superpowers/specs/2026-11-27-phong-hoc-3d-design.md);
-  - kế hoạch 8 task: [`docs/superpowers/plans/2026-11-27-phong-hoc-3d.md`](superpowers/plans/2026-11-27-phong-hoc-3d.md).
+- **Trang chủ là phòng học 3D, mốc 1 (phòng + điều hướng).** Nhánh `feat/phong-hoc-3d`, đã commit đủ 8 task, chưa có PR (bản nháp mô tả PR đã viết, chờ chủ dự án cho mở). Thiết kế: [`docs/superpowers/specs/2026-11-27-phong-hoc-3d-design.md`](superpowers/specs/2026-11-27-phong-hoc-3d-design.md); kế hoạch: [`docs/superpowers/plans/2026-11-27-phong-hoc-3d.md`](superpowers/plans/2026-11-27-phong-hoc-3d.md). Đã xong:
+  - crate thuần `room-model` (bảng `ROOM`, giao thức `ToRoom`/`FromRoom`);
+  - vỏ web: định tuyến hash, danh sách chữ các khu, lớp phủ chuyển cảnh, menu "⋯" ("Phòng đơn giản", chất lượng);
+  - `room3d` (Bevy): cảnh, mô hình CC0 (nguồn ở `crates/room3d/assets/NGUON.md`), trời theo giờ, mèo, bay camera, tự hạ chất lượng;
+  - ảnh nền chờ `crates/web/room-still.webp`; `build.sh` build cả phòng (`--no-room` để bỏ qua); `pages.yml` đưa `dist/room/` lên Pages.
 
-  Đang làm trên nhánh `feat/phong-hoc-3d`: Task 1–7 đã commit (Task 7: mô hình CC0 trong `crates/room3d/assets/`, nguồn ở `assets/NGUON.md`; bảng màu; mèo; tường có chủ đích). Còn: Task 8, rồi PR.
+  Còn:
+  - mở PR khi được phép;
+  - workflow `pages` với phòng 3D chưa chạy lần nào (PR không chạy được). Sau khi merge: xem lần chạy đầu có đẩy được `app/room/` lên `gh-pages` không;
+  - khung 3D đầu lần mở đầu tiên khoảng 11 s, vượt ngân sách 3 s; lần nạp lại 0,9 s (số đo ở `crates/web/README.md`);
+  - các việc trong "Chờ người quyết" bên dưới.
+
+  CI: xanh. Lệnh tiếp theo: `crates/web/build.sh` rồi `python -m http.server -d crates/web/dist 8091`.
 
 ## Chờ người quyết
 
@@ -64,6 +72,10 @@ Việc AI không tự làm được hoặc không được tự quyết.
   - chỉ lưu phiên đã xong, giữ tối đa 500 bài làm.
 
   Chưa làm gì có lưu trữ trước khi ADR này được chấp nhận.
+- Phòng học 3D (nhánh `feat/phong-hoc-3d`):
+  - thử trên điện thoại thật: chạm đúng vật ở 360 px (canvas chất lượng thấp dùng CSS `transform`), thời gian khung đầu, xoay máy;
+  - duyệt góc nhìn nhà ở 1280 px: bảng ghi chú và kệ huy chương nằm ngoài khung;
+  - chấp nhận mèo đứng yên (khung đầu của `Idle`) khi giảm chuyển động, vì bộ mô hình không có cảnh ngủ.
 
 ## Tiếp theo
 
@@ -71,11 +83,16 @@ Theo thứ tự. "Làm tiếp" mà không có mục dở dang ở "Đang làm" t
 
 1. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
    - Xong khi: CI đỏ nếu `web_bg.wasm` sau `wasm-opt` vượt ngưỡng ghi trong `crates/web/README.md`.
+2. **Phòng học 3D, mốc 2:** note tương tác, huy chương thật, đồ trong phòng đổi theo tiến độ. Cần ADR 0014 (lưu bài làm) được chấp nhận trước.
+   - Xong khi: huy chương và note lấy từ bài làm đã lưu, có test, thử ở 360 px.
+3. **Phòng học 3D, mốc 3:** trang trí phòng, kéo thả đồ.
+   - Xong khi: có bản thiết kế riêng được duyệt, rồi làm theo nó.
 
 ## Nợ đã biết
 
 - `bars` tự do: hai vết cắt người học đặt quá sát nhau cho vùng bấm < 24 px (ghi ở ADR 0013).
 - GitHub Pages chỉ nén gzip, không brotli. Lượng tải thật lớn hơn số đo trong `crates/web/README.md`.
+- Phòng 3D: khung đầu lần mở đầu tiên khoảng 11 s trên máy tính (ngân sách 3 s), chủ yếu do biên dịch 30 MB wasm; `room3d_bg.wasm` 4,57 MB brotli, còn dư khoảng 430 KB so với ngân sách 5 MB. Trên GitHub Pages (chỉ gzip) lượng tải lớn hơn.
 - `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 1 ở "Tiếp theo").
 
 ## Đã xong gần đây

@@ -3,6 +3,7 @@
 #   ./build.sh                bản đo (profile wasm-release: opt-z, LTO, wasm-opt -Oz, brotli)
 #   ./build.sh dev            bản lặp nhanh (không tối ưu, không wasm-opt)
 #   ./build.sh [dev] --no-room  không build phòng 3D; giữ dist/room/ cũ nếu có
+# Luôn chép ảnh nền chờ room-still.webp sang dist/room/still.webp.
 # Đối số theo thứ tự bất kỳ. Phục vụ: python -m http.server -d crates/web/dist 8091
 set -euo pipefail
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -46,4 +47,8 @@ fi
 if [ "$room" = 1 ]; then
   if [ "$profile" = dev ]; then bash "$root/crates/room3d/build.sh" dev
   else bash "$root/crates/room3d/build.sh"; fi
+fi
+# Ảnh nền chờ: chép sau khi build phòng (room3d/build.sh xoá dist/room/), kể cả --no-room.
+if [ -f "$here/room-still.webp" ]; then
+  mkdir -p "$dist/room" && cp "$here/room-still.webp" "$dist/room/still.webp"
 fi

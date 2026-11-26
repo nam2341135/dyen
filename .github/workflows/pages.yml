@@ -1,4 +1,4 @@
-# Build vỏ `web` và đưa lên GitHub Pages ở thư mục `app/` của nhánh `gh-pages`
+# Build vỏ `web` cùng phòng 3D (`dist/room/`) và đưa lên GitHub Pages ở thư mục `app/` của nhánh `gh-pages`
 # (https://nam2341135.github.io/dyen/app/) sau mỗi lần đẩy lên main.
 # Chỉ thay `app/`; các spike khác trên `gh-pages` giữ nguyên (đẩy tay, ADR 0008).
 name: pages
@@ -21,7 +21,7 @@ env:
 jobs:
   app:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - name: Cài toolchain theo rust-toolchain.toml
@@ -38,7 +38,7 @@ jobs:
           sha256sum -c "$bin.sha256"
           tar xzf "$bin" && echo "$PWD/binaryen-version_133/bin" >> "$GITHUB_PATH"
           sudo apt-get update -q && sudo apt-get install -y -q brotli
-      - name: Build
+      - name: Build (vỏ và phòng 3D)
         run: bash crates/web/build.sh
       - name: Đẩy lên gh-pages/app
         run: |
@@ -46,6 +46,8 @@ jobs:
           git worktree add pages FETCH_HEAD
           rm -rf pages/app && mkdir pages/app
           cp crates/web/dist/index.html crates/web/dist/web.js crates/web/dist/web_bg.wasm pages/app/
+          mkdir pages/app/room
+          find crates/web/dist/room -maxdepth 1 -type f ! -name '*.br' -exec cp {} pages/app/room/ \;
           cd pages
           git add -A app
           if git diff --cached --quiet; then echo "Không có gì thay đổi."; exit 0; fi
