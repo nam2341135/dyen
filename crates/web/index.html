@@ -4,54 +4,192 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>dyen</title>
 <style>
-  :root{--fg:#1d2330;--muted:#5b6474;--line:#c9d0dc;--accent:#2a6fdb;--ok:#1f8a4c;--bad:#c0392b;--bg:#fafbfc}
+  /* ADR 0013: mọi màu là biến ở đây; bộ hiển thị chỉ sinh tên lớp. */
+  /* ADR 0015: "giấy và mực". Bản tối chỉ đổi giá trị, giữ tên biến. */
+  :root{
+    color-scheme:light dark;
+    --fg:#22262e;--muted:#5c5648;--line:#d9d0bf;--line-strong:#9c8f78;
+    --accent:#1f4e79;--accent-edge:#14344f;--on-accent:#fff;--num:#9a3b1f;
+    --ok:#2e7d4f;--bad:#b3261e;--ok-bg:#e7f1e9;--bad-bg:#f8e6e2;
+    --bg:#f6f1e7;--surface:#fffcf6;--selected-bg:#e3ecf5;
+    --font-heading:ui-serif,"Noto Serif",Cambria,"Times New Roman",serif;
+    /* Okabe–Ito: phân biệt được với người mù màu đỏ–lục. */
+    --bars-c0:#0072b2;--bars-c1:#e69f00;--bars-c2:#009e73;--bars-c3:#cc79a7;--bars-strip:#ece4d4;
+    --section-cut:#1f4e7933;--section-marked:#2e7d4f99;
+    /* Phòng và lớp phủ chuyển cảnh (quyết định 8): vở màu giấy, máy tính xanh màn hình, cúp vàng. */
+    --zone-review:#f3ead6;--zone-courses:#2b5d8a;--zone-contests:#d9a520;
+    --zone-review-ink:#9c8f78;--zone-courses-ink:#e8f1fa;--zone-contests-ink:#fff6d8;
+    --room-top:#efe6d4;--room-bottom:#cdbb9c;
+    /* Thời lượng lớp phủ; khớp hằng trong crates/web/src/transition.rs. */
+    --t-cover:250ms;--t-out:200ms
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --fg:#ece6da;--muted:#b0a794;--line:#3d3a33;--line-strong:#7a715f;
+      --accent:#8fb8e0;--accent-edge:#4f7aa3;--on-accent:#10202f;--num:#e3956f;
+      --ok:#7cc79a;--bad:#f2998e;--ok-bg:#1f3327;--bad-bg:#3a2320;
+      --bg:#1b1a17;--surface:#24221e;--selected-bg:#22313f;
+      --bars-c0:#56b4e9;--bars-c1:#e69f00;--bars-c2:#2fbf95;--bars-c3:#cc79a7;--bars-strip:#2e2b26;
+      --section-cut:#8fb8e044;--section-marked:#7cc79a99;
+      --zone-review:#3a342a;--zone-courses:#173650;--zone-contests:#7a5c12;
+      --zone-review-ink:#b0a794;--zone-courses-ink:#8fb8e0;--zone-contests-ink:#f2d27a;
+      --room-top:#2a2620;--room-bottom:#1b1a17
+    }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+    /* Giảm chuyển động vẫn giữ lớp phủ mờ ngắn 150 ms (không có hiệu ứng chờ động). */
+    :root{--t-cover:150ms;--t-out:150ms}
+    .overlay.in{animation:overlay-in var(--t-cover) both!important}
+    .overlay.out{animation:overlay-out var(--t-out) both!important}
+  }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  header{padding:10px 16px;border-bottom:1px solid var(--line);background:#fff}
-  header h1{margin:0;font-size:18px}
-  main{max-width:720px;margin:0 auto;padding:12px 16px 40px}
-  h2{font-size:20px;margin:16px 0 8px}
+  header{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:4px;min-height:52px;padding:4px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  header h1{margin:0;font:600 20px/1.2 var(--font-heading)}
+  header .back{margin:0 0 0 -12px;border:none;background:none;box-shadow:none;color:var(--accent);font-size:22px;line-height:1;padding:0 12px}
+  main{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:12px 16px 40px}
+  main.on-room{pointer-events:none}
+  main.on-room>*{pointer-events:auto}
+  h2{font:600 22px/1.3 var(--font-heading);margin:16px 0 8px}
   .prompt{color:var(--muted)}
-  button{font:inherit;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--fg);cursor:pointer;min-height:40px}
+  button{font:inherit;padding:8px 14px;margin-bottom:3px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--fg);cursor:pointer;min-height:44px;min-width:44px;box-shadow:0 3px 0 var(--line-strong);transition:transform 60ms,box-shadow 60ms}
   button:hover:not(:disabled){border-color:var(--accent)}
-  button:disabled{opacity:.5;cursor:default}
+  button:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+  button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  button:disabled{opacity:.5;cursor:default;box-shadow:none;transform:translateY(3px)}
+  button.primary{background:var(--accent);border-color:var(--accent-edge);color:var(--on-accent);font-weight:600;box-shadow:0 3px 0 var(--accent-edge)}
   button.secondary{background:transparent}
-  button.link{border:none;background:none;color:var(--accent);padding:6px 0;text-align:left}
-  .catalog{list-style:none;padding:0;margin:0}
-  .catalog li{border-bottom:1px solid var(--line)}
-  .catalog button.link{width:100%;padding:10px 0}
+  .catalog{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+  button.card{display:flex;gap:12px;align-items:flex-start;width:100%;margin:0;padding:12px;border-color:var(--line);border-radius:12px;text-align:left;box-shadow:none}
+  button.card:active{transform:none;background:var(--selected-bg)}
+  .card .num{flex:none;display:grid;place-items:center;width:32px;height:32px;font:600 22px/1 var(--font-heading);color:var(--num)}
+  .card-text{min-width:0}
+  .card-text strong{display:block}
+  .card-sub{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:14px}
+  .zones ul{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:8px}
+  .zones ul[hidden]{display:none}
+  .zones button.zone{width:100%;text-align:left}
+  .zones .zones-toggle{display:none}
+  .zones.collapsed{position:fixed;left:16px;bottom:16px;z-index:1;margin:0}
+  .zones.collapsed .zones-toggle{display:block;background:var(--surface)}
+  .soon{color:var(--muted);font-size:18px}
+  .room{position:fixed;inset:0;z-index:0;background:linear-gradient(var(--room-top),var(--room-bottom))}
+  .room.away{visibility:hidden}
+  .room-still,.room canvas{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+  .room [hidden]{display:none}
+  .room canvas{opacity:0;transition:opacity .4s}
+  .room canvas.ready{opacity:1}
+  /* Chất lượng thấp: canvas nhỏ 75% (bộ đệm = cỡ CSS × DPR) rồi phóng lại đầy màn.
+     !important vì Bevy (fit_canvas_to_parent) gắn style nội tuyến width/height: 100%. */
+  .room canvas.thap{width:75%!important;height:75%!important;transform:scale(1.3333);transform-origin:0 0}
+  .room-loading,.room-label{position:fixed;left:50%;transform:translateX(-50%);z-index:1;margin:0;padding:4px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);white-space:nowrap}
+  .room-loading{bottom:16px;color:var(--muted);font-size:14px}
+  .room-label{bottom:76px;font-weight:600;pointer-events:none}
+  .room-label[hidden]{display:none}
+  .room-menu{position:fixed;right:16px;bottom:16px;z-index:1;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:8px}
+  .room-menu .room-menu-toggle{background:var(--surface);font-size:20px;line-height:1}
+  .room-menu-items{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+  .room-menu-items button{background:var(--surface);text-align:left}
+  .room-menu-items button[aria-pressed=true]::before{content:"✓ ";font-weight:600}
+  .overlay{position:fixed;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;color:var(--fg)}
+  .overlay.zone-review{background:var(--zone-review)}
+  .overlay.zone-courses{background:var(--zone-courses);color:var(--zone-courses-ink)}
+  .overlay.zone-contests{background:var(--zone-contests)}
+  .overlay.in{animation:overlay-in var(--t-cover) ease-in both}
+  .overlay.out{animation:overlay-out var(--t-out) ease-out both}
+  @keyframes overlay-in{from{opacity:0}to{opacity:1}}
+  @keyframes overlay-out{from{opacity:1}to{opacity:0}}
+  .overlay-wait{display:none}
+  .overlay.hold .overlay-wait{display:block}
+  .overlay.hold.zone-review .overlay-wait{width:64px;height:88px;border-radius:2px 8px 8px 2px;background:var(--zone-review-ink);transform-origin:left center;animation:page-flip 1.2s ease-in-out infinite}
+  .overlay.hold.zone-courses .overlay-wait{width:16px;height:36px;background:var(--zone-courses-ink);animation:cursor-blink 1s steps(1) infinite}
+  .overlay.hold.zone-contests .overlay-wait::before{content:"✦";font-size:48px;line-height:1;color:var(--zone-contests-ink)}
+  .overlay.hold.zone-contests .overlay-wait{animation:sparkle 1.2s ease-in-out infinite}
+  @keyframes page-flip{from{transform:perspective(400px) rotateY(0)}to{transform:perspective(400px) rotateY(-180deg)}}
+  @keyframes cursor-blink{50%{opacity:0}}
+  @keyframes sparkle{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+  .overlay-text{position:absolute;left:0;right:0;bottom:30%;margin:0;text-align:center;font-weight:600}
   .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
   .choices{display:flex;flex-direction:column;gap:8px;margin:8px 0}
   .choice{text-align:left}
-  .choice.selected{border-color:var(--accent);background:#e8f0fd}
+  .choice.selected{border:2px solid var(--accent);background:var(--selected-bg)}
+  .choice.selected::before{content:"✓ ";font-weight:600}
   .status{color:var(--muted)}
   .error{color:var(--bad)}
-  .outcome{border:1px solid var(--line);border-left:4px solid var(--bad);border-radius:6px;padding:8px 12px;background:#fff}
-  .outcome.ok{border-left-color:var(--ok)}
+  .outcome{margin:12px 0;border:1px solid var(--bad);border-left-width:5px;border-radius:8px;padding:12px 16px;background:var(--bad-bg)}
+  .outcome.ok{border-color:var(--ok);background:var(--ok-bg)}
+  .verdict{display:flex;align-items:center;gap:8px;margin:0;font-size:18px;font-weight:600}
+  .verdict .mark{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--bad);color:var(--surface)}
+  .ok .verdict .mark{background:var(--ok)}
+  .verdict .score{margin-left:auto;font-size:16px;font-weight:400;color:var(--muted)}
+  .outcome .notes{margin:8px 0 0;font-weight:600}
   .outcome ul{margin:4px 0 0;padding-left:20px}
   svg{display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-  svg.bars .piece{stroke:#fff;stroke-width:2;cursor:pointer}
+  svg.bars .piece{stroke:var(--surface);stroke-width:2;cursor:pointer}
   svg.bars .piece.placed{opacity:.3}
-  svg.bars .c0{fill:#4a86e8}svg.bars .c1{fill:#e69138}svg.bars .c2{fill:#6aa84f}svg.bars .c3{fill:#a64d79}
+  svg.bars .c0{fill:var(--bars-c0)}svg.bars .c1{fill:var(--bars-c1)}svg.bars .c2{fill:var(--bars-c2)}svg.bars .c3{fill:var(--bars-c3)}
   svg.bars .mark line{stroke:var(--fg);stroke-width:1.5;stroke-dasharray:4 3}
   svg.bars .cut line{stroke:var(--fg);stroke-width:3}
   svg.bars .mark,svg.bars .cut{cursor:pointer}
+  svg.bars .knob{stroke:var(--fg);stroke-width:2}
+  svg.bars .mark .knob{fill:var(--surface)}
+  svg.bars .cut .knob{fill:var(--fg)}
   svg.bars .hit{fill:transparent}
-  svg.bars .strip{fill:#eef1f6;cursor:crosshair}
+  svg.bars .strip{fill:var(--bars-strip);cursor:crosshair}
+  svg.bars.locked{pointer-events:none}
   svg.bars .ruler{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 4}
   svg.section{max-width:440px}
   svg.section .edge{stroke:var(--fg);stroke-width:2}
   svg.section .edge.hidden{stroke-dasharray:6 5;stroke:var(--muted)}
-  svg.section .cut{fill:#2a6fdb33;stroke:var(--accent);stroke-width:2}
+  svg.section .cut{fill:var(--section-cut);stroke:var(--accent);stroke-width:2}
   svg.section text{font-size:16px;fill:var(--fg)}
   svg.section .given{fill:var(--bad);font-weight:600}
-  svg.section .site{fill:#ffffff01;stroke:var(--muted);stroke-width:1;cursor:pointer}
-  svg.section .site.marked{fill:#1f8a4c99;stroke:var(--ok);stroke-width:2}
+  svg.section .site{cursor:pointer}
+  svg.section .site .dot{fill:transparent;stroke:var(--muted);stroke-width:1}
+  svg.section .site.marked .dot{fill:var(--section-marked);stroke:var(--ok);stroke-width:2}
+  svg.section .site .hit{fill:transparent}
 </style>
 <body>
 <noscript>Trang cần JavaScript và WebAssembly.</noscript>
 <script type="module">
-  import init from "./web.js";
+  import init, { dyen_from_room } from "./web.js";
+  // Cầu nối vỏ ↔ phòng 3D (bản thiết kế 6.4). Vỏ gọi dyenRoom.load và dyenToRoom;
+  // room3d (nạp lười từ ./room/) gọi window.dyenFromRoom. Không tải gì từ máy khác.
+  let room = null;  // mô-đun room3d đã chạy
+  let queue = null; // thông điệp chờ khi đang nạp; null khi không nạp (bỏ thông điệp)
+  // Báo lỗi sau lượt hiện tại, để không gọi lại vào Rust khi Rust đang gọi ra.
+  const fail = (why) =>
+    queueMicrotask(() => dyen_from_room(JSON.stringify({ t: "Failed", v: String(why) })));
+  window.dyenFromRoom = (json) => dyen_from_room(json);
+  window.dyenToRoom = (json) => {
+    if (room) room.push(json);
+    else if (queue) queue.push(json);
+  };
+  window.dyenRoom = {
+    load(json) {
+      if (room || queue) return;
+      if (!document.createElement("canvas").getContext("webgl2")) return fail("không có WebGL2");
+      queue = [json];
+      import("./room/room3d.js")
+        .then(async (m) => {
+          await m.default();
+          try {
+            m.start();
+          } catch (e) {
+            // winit trên web dùng ngoại lệ để thoát vòng lặp; đó không phải lỗi.
+            if (!String(e).includes("exceptions for control flow")) throw e;
+          }
+          room = m;
+          for (const j of queue) m.push(j);
+          queue = null;
+        })
+        .catch((e) => {
+          queue = null;
+          fail(e);
+        });
+    },
+  };
   init();
 </script>
 </body>

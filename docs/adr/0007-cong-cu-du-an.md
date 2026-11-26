@@ -18,3 +18,14 @@ Cần một lệnh duy nhất để người và AI tự kiểm tra trước khi
 
 - Không ghim phiên bản stable chính xác → hai máy có thể chạy bản khác nhau trong vài tuần. Chấp nhận ở giai đoạn một người; khi có CI hoặc thêm người, ghim phiên bản chính xác.
 - Lint dùng chung khai báo ở `[workspace.lints]`, mọi crate kế thừa.
+- **Bổ sung (2026-11-26):** `ci` có thêm bước `docs` (`cargo xtask docs`). Bước này kiểm:
+  - liên kết tương đối trong mọi file `.md`;
+  - bảng ADR khớp trạng thái từng file;
+  - `CLAUDE.md` nhập `AGENTS.md`;
+  - `docs/STATUS.md` có đủ mục;
+  - mỗi `kind-*` có README và test hợp đồng.
+
+  Lý do: tài liệu bàn giao cũ đi lặng lẽ thì người đến sau làm theo điều sai.
+- **Bổ sung (2026-11-26): đã ghim phiên bản.** `rust-toolchain.toml` ghim `channel = "1.100.0"`, là bản CI và máy cục bộ đang dùng. Nợ "không ghim phiên bản" ở trên đã trả.
+  - Nâng bản là một thay đổi riêng: sửa số, chạy `cargo xtask ci`, ghi lý do trong mô tả PR.
+  - `rust-version` trong `Cargo.toml` vẫn là bản tối thiểu.

@@ -41,7 +41,7 @@ fn body(play: PlaySignal<Choice>, items: Vec<(String, String)>) -> AnyView {
     view! {
         <div class="choices">{buttons}</div>
         <p>
-            <button on:click=move |_| act(play, Input::Submit) disabled=finished>"Nộp"</button>
+            <button class="primary" on:click=move |_| act(play, Input::Submit) disabled=finished>"Nộp"</button>
             " "
             <span class="status">{status}</span>
         </p>

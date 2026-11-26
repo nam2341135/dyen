@@ -1,11 +1,13 @@
 # Tài liệu dự án
 
-Đọc theo thứ tự này:
+Muốn biết đang làm gì và làm gì tiếp: [STATUS.md](STATUS.md). Muốn biết làm một việc thế nào: [playbooks/](playbooks/README.md).
 
-1. [vision.md](vision.md) — ràng buộc và nguyên tắc kiến trúc.
-2. [glossary.md](glossary.md) — bộ từ cố định.
-3. [adr/](adr/) — các quyết định kiến trúc.
-4. [ideas/](ideas/) — phác thảo ý tưởng (nháp, dùng để thử lõi; không phải quyết định).
+Muốn hiểu dự án, đọc theo thứ tự này:
+
+1. [vision.md](vision.md): ràng buộc và nguyên tắc kiến trúc.
+2. [glossary.md](glossary.md): bộ từ cố định.
+3. [adr/](adr/): các quyết định kiến trúc (bảng dưới).
+4. [ideas/](ideas/README.md): phác thảo ý tưởng. Đây là nháp để thử lõi, không phải quyết định.
 
 ## Quyết định kiến trúc
 
@@ -23,19 +25,13 @@
 | [0010](adr/0010-loi-trung-lap.md) | Lõi trung lập: loại hoạt động là crate, sổ đăng ký là enum đóng | Chấp nhận |
 | [0011](adr/0011-nhan-tu-cau-hinh.md) | Loại hoạt động công bố thêm nhãn từ cấu hình | Chấp nhận |
 | [0012](adr/0012-toan-chinh-xac.md) | Tầng thư viện thuần `lib-*` và toán chính xác `lib-exact` | Chấp nhận |
+| [0013](adr/0013-quy-uoc-bo-hien-thi.md) | Quy ước chung cho bộ hiển thị: vùng chạm, animation, kiểu dáng | Chấp nhận |
+| [0014](adr/0014-luu-bai-lam-cuc-bo.md) | Lưu bài làm cục bộ, ẩn danh, trên máy người học | Đề xuất |
+| [0015](adr/0015-ngon-ngu-thiet-ke-giay-muc.md) | Ngôn ngữ thiết kế "giấy và mực", nút nổi | Đề xuất |
+| [0016](adr/0016-trang-chu-phong-hoc-3d.md) | Trang chủ là phòng học 3D | Chấp nhận |
 
 Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, cập nhật bảng này.
 
-## Lộ trình nền móng
+## Lộ trình
 
-| Tầng | Nội dung | Trạng thái |
-|---|---|---|
-| 0 | Tài liệu quyết định (thư mục này, `CLAUDE.md`) | Xong |
-| 1 | Bộ khung workspace, `cargo xtask ci`, kiểm tra ranh giới | Xong |
-| 2 | Hợp đồng lõi: trait mô hình, định dạng dấu vết có phiên bản, chấm/chẩn đoán, lược đồ nội dung; một mô hình thật (thanh cắt + thước) | Xong |
-| 3 | `dyen replay`, dấu vết mẫu + snapshot test, property test, kiểm tra nội dung trong CI | Xong |
-| 4 | Tái cấu trúc lõi trung lập (ADR 0010): `kernel`, `kind-bars`, `registry` | Xong |
-| — | Spike Leptos + Bevy (chốt ADR 0008) | Xong — iPhone 12 khung 3D đầu 7,0 s qua mạng di động; còn nợ đo Android |
-| — | Loại hoạt động thứ hai `kind-choice` (kiểm chứng ADR 0010; sinh ra ADR 0011) | Xong |
-| — | Loại hình học đầu tiên `kind-section` (thiết diện lập phương) cùng `lib-exact` (kiểm chứng ADR 0012) | Xong |
-| — | Vỏ `web` tối thiểu (Leptos CSR): danh mục, chơi `bars`/`choice`/`section`, hiện kết quả | Xong — wasm 188 KB brotli |
+Tiến độ, việc tiếp theo và các mốc đã xong nằm ở [STATUS.md](STATUS.md). Không ghi ở đây, để tránh hai nơi lệch nhau.

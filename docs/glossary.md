@@ -32,6 +32,14 @@ Trang này chỉ chứa thuật ngữ **chung**, không thuộc ý tưởng sư 
 | Hoạt động | `Activity` | Một file nội dung: tên, lời dẫn, nhãn, và cấu hình của một loại hoạt động. |
 | Gói hoạt động | `ActivitySet` | Chuỗi hoạt động có thứ tự giao một lần. |
 
+## Phòng học 3D (vỏ web, ADR 0016)
+
+| Tiếng Việt | Trong code | Định nghĩa |
+|---|---|---|
+| Phòng | `Room` (bảng `ROOM`) | Trang chủ 3D: bảng các chỗ đặt đồ; chỉ để điều hướng, không chứa chức năng học. |
+| Khu | `Zone` | Một khu của vỏ (ôn tập, khóa học, thi đấu) mà một vật trong phòng dẫn tới. Khái niệm của vỏ, không có trong lõi. |
+| Chỗ đặt đồ | `Slot` | Một vị trí trong phòng: mã, loại đồ vật, vị trí (cm), hướng, và khu dẫn tới (nếu có). |
+
 ## Sản phẩm (chưa có code)
 
 | Tiếng Việt | Trong code | Định nghĩa |

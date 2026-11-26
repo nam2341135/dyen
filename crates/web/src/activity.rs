@@ -1,7 +1,8 @@
-//! Màn hình làm một hoạt động: tiêu đề, đề bài, bộ hiển thị của loại, nút quay lại.
+//! Màn hình làm một hoạt động: tiêu đề, đề bài, bộ hiển thị của loại.
+//!
+//! Nút về danh mục nằm ở thanh tiêu đề (`App`).
 
 use content::Activity;
-use kernel::ActivityId;
 use leptos::prelude::*;
 use registry::AnyConfig;
 
@@ -16,10 +17,9 @@ fn renderer(config: &AnyConfig) -> AnyView {
     }
 }
 
-/// Vẽ màn hình hoạt động; nút "Quay lại" xoá `current`.
-pub fn view(activity: &'static Activity, current: RwSignal<Option<ActivityId>>) -> impl IntoView {
+/// Vẽ màn hình hoạt động.
+pub fn view(activity: &'static Activity) -> impl IntoView {
     view! {
-        <p><button class="link" on:click=move |_| current.set(None)>"← Quay lại"</button></p>
         <h2>{activity.title.clone()}</h2>
         <p class="prompt">{activity.prompt.clone()}</p>
         {renderer(&activity.config)}

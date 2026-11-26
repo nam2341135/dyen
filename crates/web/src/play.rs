@@ -66,6 +66,16 @@ impl<K: Kind> Play<K> {
             .map(|e| e.to_string());
     }
 
+    /// Như [`act`](Self::act), nhưng bỏ qua đầu vào khi `ended` báo phiên đã kết thúc:
+    /// không ghi bước, không báo lỗi. Trả về `true` nếu đầu vào được đưa vào phiên.
+    pub fn act_unless(&mut self, now_ms: u32, input: K::Input, ended: fn(&Self) -> bool) -> bool {
+        if ended(self) {
+            return false;
+        }
+        self.act(now_ms, input);
+        true
+    }
+
     /// Làm lại từ đầu với cùng cấu hình.
     pub fn reset(&mut self, now_ms: u32) {
         let config = self.session.config().clone();
@@ -138,6 +148,16 @@ mod tests {
                 key: "third".into(),
             },
         );
+        assert_eq!(play.last_error(), None);
+    }
+
+    #[test]
+    fn phien_da_xong_khong_nhan_dau_vao() {
+        let mut play = Play::<Choice>::new(config(), 0).expect("cấu hình hợp lệ");
+        let ended = |p: &Play<Choice>| p.steps() >= 1;
+        assert!(play.act_unless(1, Input::Select { key: "half".into() }, ended));
+        assert!(!play.act_unless(2, Input::Submit, ended));
+        assert_eq!(play.steps(), 1);
         assert_eq!(play.last_error(), None);
     }
 

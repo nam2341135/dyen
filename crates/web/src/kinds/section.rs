@@ -12,6 +12,13 @@ use super::{PlaySignal, act, footer, start};
 const HIDDEN: [&str; 3] = ["cd", "da", "dd1"];
 /// Tên các điểm đề cho, theo thứ tự trong cấu hình.
 const GIVEN_NAMES: [&str; 3] = ["M", "N", "P"];
+/// Bán kính chấm vẽ ở mỗi vị trí bấm được.
+const DOT_R: f64 = 9.0;
+/// Bán kính vùng bấm (trong suốt) quanh mỗi vị trí: ≥ 24 px ở màn 360 px (ADR 0013).
+const HIT_R: f64 = 15.0;
+
+/// Bề rộng `viewBox`.
+const VIEW_W: f64 = 400.0;
 
 /// Chiếu xiên một điểm của lập phương đơn vị vào `viewBox="0 0 400 380"`.
 ///
@@ -76,10 +83,10 @@ fn body(play: PlaySignal<Section>, sites: Vec<(&'static str, Vec3)>) -> AnyView 
     };
     let finished = move || play.with(|p| p.state().finished());
     view! {
-        <svg class="section" viewBox="0 0 400 380" width="100%">{figure}</svg>
+        <svg class="section" viewBox=format!("0 0 {VIEW_W} 380") width="100%">{figure}</svg>
         <p>{marked}</p>
         <p>
-            <button on:click=move |_| act(play, Input::Cut) disabled=finished>"Cắt"</button>
+            <button class="primary" on:click=move |_| act(play, Input::Cut) disabled=finished>"Cắt"</button>
             " "
             <span class="status">{status}</span>
         </p>
@@ -143,15 +150,14 @@ fn figure(play: PlaySignal<Section>, state: &State, sites: &[(&'static str, Vec3
                 Input::Mark { site }
             };
             view! {
-                <circle
+                <g
                     class=if is_marked { "site marked" } else { "site" }
-                    cx=x
-                    cy=y
-                    r=9.0
                     on:click=move |_| act(play, input.clone())
                 >
                     <title>{site_label(key)}</title>
-                </circle>
+                    <circle class="dot" cx=x cy=y r=DOT_R />
+                    <circle class="hit" cx=x cy=y r=HIT_R />
+                </g>
             }
         })
         .collect_view();
@@ -235,6 +241,24 @@ mod tests {
         ];
         let ratio = area(&hexagon) / area(&front);
         assert!(ratio >= 0.3, "lục giác chỉ bằng {ratio:.3} mặt trước");
+    }
+
+    #[test]
+    fn vung_bam_du_lon_va_khong_chong() {
+        use crate::kinds::tests::{MIN_TARGET_PX, PHONE_SVG_PX};
+        let px = 2.0 * HIT_R * PHONE_SVG_PX / VIEW_W;
+        assert!(px >= MIN_TARGET_PX, "vùng bấm chỉ {px:.1} px");
+        let pts: Vec<(f64, f64)> = site_points()
+            .expect("hình học lập phương hợp lệ")
+            .into_iter()
+            .map(|(_, p)| project_vec(p))
+            .collect();
+        for (i, a) in pts.iter().enumerate() {
+            for b in &pts[i + 1..] {
+                let d = (a.0 - b.0).hypot(a.1 - b.1);
+                assert!(d >= 2.0 * HIT_R, "hai vị trí cách {d:.1} < {}", 2.0 * HIT_R);
+            }
+        }
     }
 
     #[test]

@@ -19,14 +19,16 @@ Workspace chia theo ranh giới trách nhiệm:
 | `registry` | Danh sách đóng các loại hoạt động; chỗ duy nhất rẽ nhánh theo loại | `kernel`, `kind-*` | Thuần |
 | `content` | Đọc và kiểm tra file nội dung | `kernel`, `registry` | Có IO |
 | `cli` | Công cụ dòng lệnh `dyen` (phát lại, kiểm tra nội dung) | `kernel`, `registry`, `content` | Có IO |
-| `web` | Vỏ ứng dụng trên trình duyệt (Leptos CSR, ADR 0008): chọn hoạt động, bộ hiển thị 2D của từng loại, kết quả | `kernel`, `lib-*`, `kind-*`, `registry`, `content` | Có IO (trình duyệt) |
+| `web` | Vỏ ứng dụng trên trình duyệt (Leptos CSR, ADR 0008): chọn hoạt động, bộ hiển thị 2D của từng loại, kết quả | `kernel`, `lib-*`, `kind-*`, `registry`, `content`, `room-model` | Có IO (trình duyệt) |
+| `room-model` | Bảng chỗ đặt đồ, khu và thông điệp cầu nối của phòng học 3D (ADR 0016) | — | Thuần |
+| `room3d` | Cảnh phòng học 3D (Bevy, gói wasm riêng, ADR 0016) | `room-model` | Có IO (trình duyệt) |
 | `xtask` | Công cụ dự án (CI cục bộ, kiểm tra ranh giới) | — | Công cụ |
 
-Sẽ thêm sau (chưa tạo): `table3d` (Bevy), `server` (Axum).
+Sẽ thêm sau (chưa tạo): `table3d` (Bevy), `server` (Axum). `web` không được phụ thuộc `room3d`.
 
 `web` được phụ thuộc trực tiếp `kind-*` vì bộ hiển thị 2D cần kiểu `State`/`Input` của từng loại (ADR 0010). Không crate nào được phụ thuộc `web`.
 
-**Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`) không được phụ thuộc thư viện bên ngoài nào ngoài danh sách cho phép trong `xtask/src/deps.rs` (hiện tại: `serde`, `thiserror` và phụ thuộc bắc cầu của chúng). Không IO, không mạng, không đồng hồ, không thread.
+**Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`, `room-model`) không được phụ thuộc thư viện bên ngoài nào ngoài danh sách cho phép trong `xtask/src/deps.rs` (hiện tại: `serde`, `thiserror` và phụ thuộc bắc cầu của chúng). Không IO, không mạng, không đồng hồ, không thread.
 
 `cargo xtask deps` kiểm tra bảng trên bằng `cargo metadata`; chạy trong `cargo xtask ci`.
 

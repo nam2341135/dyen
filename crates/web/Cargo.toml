@@ -18,8 +18,11 @@ kind-bars.workspace = true
 kind-choice.workspace = true
 kind-section.workspace = true
 lib-exact.workspace = true
+room-model.workspace = true
+serde_json.workspace = true
 leptos.workspace = true
 wasm-bindgen.workspace = true
+js-sys.workspace = true
 web-sys.workspace = true
 
 [lints]

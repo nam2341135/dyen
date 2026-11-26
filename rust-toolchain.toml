@@ -1,4 +1,7 @@
+# Ghim bản chính xác (ADR 0007): CI và mọi máy dùng cùng một rustc.
+# Nâng bản: sửa số ở đây, chạy `cargo xtask ci`, ghi lý do trong mô tả PR.
+# `rust-version` trong Cargo.toml là bản tối thiểu, có thể thấp hơn.
 [toolchain]
-channel = "stable"
+channel = "1.100.0"
 components = ["rustfmt", "clippy"]
 targets = ["wasm32-unknown-unknown"]
