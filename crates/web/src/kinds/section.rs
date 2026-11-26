@@ -86,7 +86,7 @@ fn body(play: PlaySignal<Section>, sites: Vec<(&'static str, Vec3)>) -> AnyView 
         <svg class="section" viewBox=format!("0 0 {VIEW_W} 380") width="100%">{figure}</svg>
         <p>{marked}</p>
         <p>
-            <button on:click=move |_| act(play, Input::Cut) disabled=finished>"Cắt"</button>
+            <button class="primary" on:click=move |_| act(play, Input::Cut) disabled=finished>"Cắt"</button>
             " "
             <span class="status">{status}</span>
         </p>
