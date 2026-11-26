@@ -93,6 +93,7 @@ Theo thứ tự. "Làm tiếp" mà không có mục dở dang ở "Đang làm" t
 - `bars` tự do: hai vết cắt người học đặt quá sát nhau cho vùng bấm < 24 px (ghi ở ADR 0013).
 - GitHub Pages chỉ nén gzip, không brotli. Lượng tải thật lớn hơn số đo trong `crates/web/README.md`.
 - Phòng 3D: khung đầu lần mở đầu tiên khoảng 11 s trên máy tính (ngân sách 3 s), chủ yếu do biên dịch 30 MB wasm; `room3d_bg.wasm` 4,57 MB brotli, còn dư khoảng 430 KB so với ngân sách 5 MB. Trên GitHub Pages (chỉ gzip) lượng tải lớn hơn.
+- Back của trình duyệt khi phòng đang bay/lớp phủ vào, hoặc lần Back thứ hai trong lúc Leaving, rời trang thay vì huỷ như Esc (hash còn `#/`); sửa ở `transition.rs`/`Shell`.
 - `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 1 ở "Tiếp theo").
 
 ## Đã xong gần đây
