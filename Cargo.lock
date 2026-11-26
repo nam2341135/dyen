@@ -1805,6 +1805,7 @@ dependencies = [
  "lib-exact",
  "registry",
  "room-model",
+ "serde_json",
  "wasm-bindgen",
  "web-sys",
 ]

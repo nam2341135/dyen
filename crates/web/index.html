@@ -15,7 +15,13 @@
     --font-heading:ui-serif,"Noto Serif",Cambria,"Times New Roman",serif;
     /* Okabe–Ito: phân biệt được với người mù màu đỏ–lục. */
     --bars-c0:#0072b2;--bars-c1:#e69f00;--bars-c2:#009e73;--bars-c3:#cc79a7;--bars-strip:#ece4d4;
-    --section-cut:#1f4e7933;--section-marked:#2e7d4f99
+    --section-cut:#1f4e7933;--section-marked:#2e7d4f99;
+    /* Phòng và lớp phủ chuyển cảnh (quyết định 8): vở màu giấy, máy tính xanh màn hình, cúp vàng. */
+    --zone-review:#f3ead6;--zone-courses:#2b5d8a;--zone-contests:#d9a520;
+    --zone-review-ink:#9c8f78;--zone-courses-ink:#e8f1fa;--zone-contests-ink:#fff6d8;
+    --room-top:#efe6d4;--room-bottom:#cdbb9c;
+    /* Thời lượng lớp phủ; khớp hằng trong crates/web/src/transition.rs. */
+    --t-cover:250ms;--t-out:200ms
   }
   @media (prefers-color-scheme:dark){
     :root{
@@ -24,18 +30,27 @@
       --ok:#7cc79a;--bad:#f2998e;--ok-bg:#1f3327;--bad-bg:#3a2320;
       --bg:#1b1a17;--surface:#24221e;--selected-bg:#22313f;
       --bars-c0:#56b4e9;--bars-c1:#e69f00;--bars-c2:#2fbf95;--bars-c3:#cc79a7;--bars-strip:#2e2b26;
-      --section-cut:#8fb8e044;--section-marked:#7cc79a99
+      --section-cut:#8fb8e044;--section-marked:#7cc79a99;
+      --zone-review:#3a342a;--zone-courses:#173650;--zone-contests:#7a5c12;
+      --zone-review-ink:#b0a794;--zone-courses-ink:#8fb8e0;--zone-contests-ink:#f2d27a;
+      --room-top:#2a2620;--room-bottom:#1b1a17
     }
   }
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+    /* Giảm chuyển động vẫn giữ lớp phủ mờ ngắn 150 ms (không có hiệu ứng chờ động). */
+    :root{--t-cover:150ms;--t-out:150ms}
+    .overlay.in{animation:overlay-in var(--t-cover) both!important}
+    .overlay.out{animation:overlay-out var(--t-out) both!important}
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   header{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:4px;min-height:52px;padding:4px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
   header h1{margin:0;font:600 20px/1.2 var(--font-heading)}
   header .back{margin:0 0 0 -12px;border:none;background:none;box-shadow:none;color:var(--accent);font-size:22px;line-height:1;padding:0 12px}
-  main{max-width:720px;margin:0 auto;padding:12px 16px 40px}
+  main{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:12px 16px 40px}
+  main.on-room{pointer-events:none}
+  main.on-room>*{pointer-events:auto}
   h2{font:600 22px/1.3 var(--font-heading);margin:16px 0 8px}
   .prompt{color:var(--muted)}
   button{font:inherit;padding:8px 14px;margin-bottom:3px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--fg);cursor:pointer;min-height:44px;min-width:44px;box-shadow:0 3px 0 var(--line-strong);transition:transform 60ms,box-shadow 60ms}
@@ -59,6 +74,39 @@
   .zones.collapsed{position:fixed;left:16px;bottom:16px;z-index:1;margin:0}
   .zones.collapsed .zones-toggle{display:block;background:var(--surface)}
   .soon{color:var(--muted);font-size:18px}
+  .room{position:fixed;inset:0;z-index:0;background:linear-gradient(var(--room-top),var(--room-bottom))}
+  .room.away{visibility:hidden}
+  .room-still,.room canvas{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+  .room [hidden]{display:none}
+  .room canvas{opacity:0;transition:opacity .4s}
+  .room canvas.ready{opacity:1}
+  .room-loading,.room-label{position:fixed;left:50%;transform:translateX(-50%);z-index:1;margin:0;padding:4px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);white-space:nowrap}
+  .room-loading{bottom:16px;color:var(--muted);font-size:14px}
+  .room-label{bottom:76px;font-weight:600;pointer-events:none}
+  .room-label[hidden]{display:none}
+  .room-menu{position:fixed;right:16px;bottom:16px;z-index:1;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:8px}
+  .room-menu .room-menu-toggle{background:var(--surface);font-size:20px;line-height:1}
+  .room-menu-items{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+  .room-menu-items button{background:var(--surface);text-align:left}
+  .room-menu-items button[aria-pressed=true]::before{content:"✓ ";font-weight:600}
+  .overlay{position:fixed;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;color:var(--fg)}
+  .overlay.zone-review{background:var(--zone-review)}
+  .overlay.zone-courses{background:var(--zone-courses);color:var(--zone-courses-ink)}
+  .overlay.zone-contests{background:var(--zone-contests)}
+  .overlay.in{animation:overlay-in var(--t-cover) ease-in both}
+  .overlay.out{animation:overlay-out var(--t-out) ease-out both}
+  @keyframes overlay-in{from{opacity:0}to{opacity:1}}
+  @keyframes overlay-out{from{opacity:1}to{opacity:0}}
+  .overlay-wait{display:none}
+  .overlay.hold .overlay-wait{display:block}
+  .overlay.hold.zone-review .overlay-wait{width:64px;height:88px;border-radius:2px 8px 8px 2px;background:var(--zone-review-ink);transform-origin:left center;animation:page-flip 1.2s ease-in-out infinite}
+  .overlay.hold.zone-courses .overlay-wait{width:16px;height:36px;background:var(--zone-courses-ink);animation:cursor-blink 1s steps(1) infinite}
+  .overlay.hold.zone-contests .overlay-wait::before{content:"✦";font-size:48px;line-height:1;color:var(--zone-contests-ink)}
+  .overlay.hold.zone-contests .overlay-wait{animation:sparkle 1.2s ease-in-out infinite}
+  @keyframes page-flip{from{transform:perspective(400px) rotateY(0)}to{transform:perspective(400px) rotateY(-180deg)}}
+  @keyframes cursor-blink{50%{opacity:0}}
+  @keyframes sparkle{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+  .overlay-text{position:absolute;left:0;right:0;bottom:30%;margin:0;text-align:center;font-weight:600}
   .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
   .choices{display:flex;flex-direction:column;gap:8px;margin:8px 0}
   .choice{text-align:left}
@@ -102,7 +150,43 @@
 <body>
 <noscript>Trang cần JavaScript và WebAssembly.</noscript>
 <script type="module">
-  import init from "./web.js";
+  import init, { dyen_from_room } from "./web.js";
+  // Cầu nối vỏ ↔ phòng 3D (bản thiết kế 6.4). Vỏ gọi dyenRoom.load và dyenToRoom;
+  // room3d (nạp lười từ ./room/) gọi window.dyenFromRoom. Không tải gì từ máy khác.
+  let room = null;  // mô-đun room3d đã chạy
+  let queue = null; // thông điệp chờ khi đang nạp; null khi không nạp (bỏ thông điệp)
+  // Báo lỗi sau lượt hiện tại, để không gọi lại vào Rust khi Rust đang gọi ra.
+  const fail = (why) =>
+    queueMicrotask(() => dyen_from_room(JSON.stringify({ t: "Failed", v: String(why) })));
+  window.dyenFromRoom = (json) => dyen_from_room(json);
+  window.dyenToRoom = (json) => {
+    if (room) room.push(json);
+    else if (queue) queue.push(json);
+  };
+  window.dyenRoom = {
+    load(json) {
+      if (room || queue) return;
+      if (!document.createElement("canvas").getContext("webgl2")) return fail("không có WebGL2");
+      queue = [json];
+      import("./room/room3d.js")
+        .then(async (m) => {
+          await m.default();
+          try {
+            m.start();
+          } catch (e) {
+            // winit trên web dùng ngoại lệ để thoát vòng lặp; đó không phải lỗi.
+            if (!String(e).includes("exceptions for control flow")) throw e;
+          }
+          room = m;
+          for (const j of queue) m.push(j);
+          queue = null;
+        })
+        .catch((e) => {
+          queue = null;
+          fail(e);
+        });
+    },
+  };
   init();
 </script>
 </body>

@@ -11,13 +11,16 @@ pub mod kinds;
 pub mod library;
 pub mod outcome;
 pub mod play;
+pub mod room;
 pub mod route;
+pub mod shell;
+pub mod transition;
 pub mod zones;
 
 use leptos::prelude::*;
 use route::Route;
 
-/// Gốc ứng dụng: danh mục, hoặc màn hình hoạt động đang chọn.
+/// Gốc ứng dụng: phòng (nền 3D và danh sách khu), các khu, lớp phủ chuyển cảnh.
 #[component]
 pub fn App() -> impl IntoView {
     let lib = match library::get() {
@@ -27,12 +30,19 @@ pub fn App() -> impl IntoView {
         }
     };
     let route = RwSignal::new(Route::parse(&route::current_hash(), lib));
+    let shell = shell::Shell::new();
     // Điều hướng chỉ đặt `location.hash`; `hashchange` cập nhật `route` (Back hoạt động).
     #[cfg(target_arch = "wasm32")]
     {
         use wasm_bindgen::{JsCast, closure::Closure};
+        shell.listen(route);
+        let first = route.get_untracked();
+        shell.route_changed(&first, &first);
         let on_change = Closure::<dyn Fn()>::new(move || {
-            route.set(Route::parse(&route::current_hash(), lib));
+            let new = Route::parse(&route::current_hash(), lib);
+            let old = route.get_untracked();
+            route.set(new.clone());
+            shell.route_changed(&old, &new);
         });
         if let Some(w) = web_sys::window() {
             // Lỗi đăng ký nghe là không có gì để làm thêm.
@@ -43,12 +53,7 @@ pub fn App() -> impl IntoView {
     }
     let go = |r: Route| route::go(&r);
     let screen = move || match route.get() {
-        Route::Room => zones::list(
-            move |z| go(zones::route(z)),
-            |_| {},
-            Signal::derive(|| false),
-        )
-        .into_any(),
+        Route::Room => shell::screen(shell).into_any(),
         Route::Review => catalog::view(lib, move |id| go(Route::Activity(id))).into_any(),
         Route::Activity(id) => match lib.activities().get(&id) {
             Some(a) => activity::view(a).into_any(),
@@ -68,8 +73,10 @@ pub fn App() -> impl IntoView {
         })
     };
     view! {
+        {shell::backdrop(shell, route)}
         <header>{back}<h1>"dyen"</h1></header>
-        <main>{screen}</main>
+        <main class:on-room=move || route.get() == Route::Room>{screen}</main>
+        {shell::overlay(shell)}
     }
     .into_any()
 }
