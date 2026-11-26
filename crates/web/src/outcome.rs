@@ -13,7 +13,7 @@ pub fn percent(permille: u16) -> String {
     }
 }
 
-/// Khối kết quả: điểm, đạt/chưa đạt, các phát hiện.
+/// Khối kết quả: dấu và chữ đạt/chưa đạt, điểm, rồi "Nhận xét" (các phát hiện) nếu có.
 pub fn view(outcome: &Outcome) -> impl IntoView + use<> {
     let tags = library::get().ok().map(|l| l.tags());
     let findings = outcome
@@ -31,16 +31,25 @@ pub fn view(outcome: &Outcome) -> impl IntoView + use<> {
             view! { <li>{title}{note}</li> }
         })
         .collect_view();
-    let (class, verdict) = if outcome.completed {
-        ("outcome ok", "Đã đạt")
+    let notes = (!outcome.findings.is_empty()).then(|| {
+        view! {
+            <p class="notes">"Nhận xét"</p>
+            <ul>{findings}</ul>
+        }
+    });
+    let (class, mark, verdict) = if outcome.completed {
+        ("outcome ok", "✓", "Đã đạt")
     } else {
-        ("outcome", "Chưa đạt")
+        ("outcome", "!", "Chưa đạt")
     };
     view! {
-        <section class=class>
-            <strong>{verdict}</strong>
-            {format!(" · điểm {}", percent(outcome.score.permille()))}
-            <ul>{findings}</ul>
+        <section class=class role="status">
+            <p class="verdict">
+                <span class="mark" aria-hidden="true">{mark}</span>
+                {verdict}
+                <span class="score">{format!("điểm {}", percent(outcome.score.permille()))}</span>
+            </p>
+            {notes}
         </section>
     }
 }

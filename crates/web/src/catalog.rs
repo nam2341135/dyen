@@ -2,7 +2,7 @@
 
 use std::collections::BTreeSet;
 
-use content::Library;
+use content::{Activity, Library};
 use kernel::ActivityId;
 use leptos::prelude::*;
 
@@ -29,7 +29,8 @@ pub fn groups(lib: &Library) -> Vec<(String, Vec<ActivityId>)> {
     out
 }
 
-/// Vẽ danh mục; bấm một hoạt động thì đặt `current`.
+/// Vẽ danh mục: mỗi hoạt động là một thẻ có số thứ tự trong gói, tiêu đề và đề bài
+/// (cắt còn hai dòng). Bấm thẻ thì đặt `current`.
 pub fn view(lib: &'static Library, current: RwSignal<Option<ActivityId>>) -> impl IntoView {
     groups(lib)
         .into_iter()
@@ -37,12 +38,17 @@ pub fn view(lib: &'static Library, current: RwSignal<Option<ActivityId>>) -> imp
             let links = ids
                 .into_iter()
                 .filter_map(|id| lib.activities().get(&id))
-                .map(|a| {
+                .zip(1..)
+                .map(|(a, n): (&Activity, u32)| {
                     let id = a.id.clone();
                     view! {
                         <li>
-                            <button class="link" on:click=move |_| current.set(Some(id.clone()))>
-                                {a.title.clone()}
+                            <button class="card" on:click=move |_| current.set(Some(id.clone()))>
+                                <span class="num" aria-hidden="true">{n}</span>
+                                <span class="card-text">
+                                    <strong>{a.title.clone()}</strong>
+                                    <span class="card-sub">{a.prompt.clone()}</span>
+                                </span>
                             </button>
                         </li>
                     }

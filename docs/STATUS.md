@@ -30,6 +30,13 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
 - **Ghim Rust 1.100.0** trong `rust-toolchain.toml` (ADR 0007, bổ sung 2026-11-26). Nhánh `ci/ghim-rust`, PR #9, xếp chồng lên PR #8. CI xanh ở máy. Còn: người duyệt và merge, sau PR #8.
 
+- **Bố cục vỏ web.** Nhánh `feat/bo-cuc-vo-web`, PR #10, xếp chồng lên PR #9. Người dùng bảo "cứ làm đi" nên làm thẳng, không qua bản phác. Đã xong:
+  - thanh tiêu đề dính trên cùng, có nút "←" về danh mục (44 px);
+  - danh mục dạng thẻ: số thứ tự trong gói, tiêu đề, đề bài cắt còn hai dòng;
+  - khối kết quả: dấu ✓/!, "Đã đạt"/"Chưa đạt", điểm bên phải, mục "Nhận xét" chỉ hiện khi có phát hiện.
+
+  Đã thử ở 360 px, CI xanh. Còn: người duyệt giao diện và merge, sau PR #9.
+
 ## Chờ người quyết
 
 Việc AI không tự làm được hoặc không được tự quyết.
@@ -48,16 +55,14 @@ Việc AI không tự làm được hoặc không được tự quyết.
 
 Theo thứ tự. "Làm tiếp" mà không có mục dở dang ở "Đang làm" thì làm mục đầu tiên ở đây, trên nhánh riêng `loại/tên-ngắn` ([ban-giao.md](playbooks/ban-giao.md)). Mỗi mục có tiêu chí xong.
 
-1. **Bố cục và giao diện vỏ web.** Gồm trang danh mục, thanh tiêu đề, trang kết quả. Chỉ sửa stylesheet và cấu trúc theo ADR 0013.
-   - Xong khi: có bản thiết kế được duyệt, thử ở 360 px.
-2. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
+1. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
    - Xong khi: CI đỏ nếu `web_bg.wasm` sau `wasm-opt` vượt ngưỡng ghi trong `crates/web/README.md`.
 
 ## Nợ đã biết
 
 - `bars` tự do: hai vết cắt người học đặt quá sát nhau cho vùng bấm < 24 px (ghi ở ADR 0013).
 - GitHub Pages chỉ nén gzip, không brotli. Lượng tải thật lớn hơn số đo trong `crates/web/README.md`.
-- `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 2 ở "Tiếp theo").
+- `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 1 ở "Tiếp theo").
 
 ## Đã xong gần đây
 
