@@ -38,3 +38,4 @@ Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, 
 | — | Spike Leptos + Bevy (chốt ADR 0008) | Xong — iPhone 12 khung 3D đầu 7,0 s qua mạng di động; còn nợ đo Android |
 | — | Loại hoạt động thứ hai `kind-choice` (kiểm chứng ADR 0010; sinh ra ADR 0011) | Xong |
 | — | Loại hình học đầu tiên `kind-section` (thiết diện lập phương) cùng `lib-exact` (kiểm chứng ADR 0012) | Xong |
+| — | Vỏ `web` tối thiểu (Leptos CSR): danh mục, chơi `bars`/`choice`/`section`, hiện kết quả | Xong — wasm 188 KB brotli |

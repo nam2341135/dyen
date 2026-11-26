@@ -40,3 +40,5 @@ Loại hoạt động `section`: tìm **thiết diện** của hình lập phư�
 ## Bộ hiển thị
 
 `State::section()` có tọa độ chính xác của các đỉnh thiết diện theo thứ tự vị trí, không theo vòng đa giác; bộ hiển thị tự sắp (bằng `f32`, chỉ để vẽ) và chỉ hiện sau khi cắt.
+
+`site_points()` cho tọa độ chính xác của 20 vị trí (đỉnh; cạnh lấy trung điểm) và `edge_ends()` cho hai đầu mỗi cạnh — chỉ để vẽ chỗ bấm, không dùng cho đánh giá.

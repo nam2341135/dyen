@@ -7,3 +7,6 @@
 # Spike: sản phẩm build
 /spikes/*/target
 /spikes/*/dist
+
+# Vỏ web: sản phẩm build
+/crates/web/dist

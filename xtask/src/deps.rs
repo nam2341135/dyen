@@ -20,6 +20,13 @@ const RULES: &[(&str, &[&str], bool)] = &[
     ("registry", &["kernel", "kind-*"], true),
     ("content", &["kernel", "registry"], false),
     ("cli", &["kernel", "registry", "content"], false),
+    // Vỏ ứng dụng trình duyệt (Leptos, ADR 0008): chứa bộ hiển thị 2D của từng loại,
+    // nên được phụ thuộc trực tiếp `kind-*` (ADR 0010).
+    (
+        "web",
+        &["kernel", "lib-*", "kind-*", "registry", "content"],
+        false,
+    ),
     ("xtask", &[], false),
 ];
 
@@ -195,6 +202,27 @@ mod tests {
     fn bo_qua_phu_thuoc_dev() {
         let meta = json!({ "packages": [pkg("kernel", &[("proptest", Some("dev"))])] });
         assert!(violations(&meta).is_empty());
+    }
+
+    #[test]
+    fn web_duoc_phu_thuoc_loai_va_noi_dung() {
+        let meta = json!({ "packages": [
+            pkg("web", &[
+                ("kernel", None), ("registry", None), ("content", None),
+                ("kind-bars", None), ("lib-exact", None), ("leptos", None),
+            ]),
+        ]});
+        assert!(violations(&meta).is_empty(), "{:?}", violations(&meta));
+    }
+
+    #[test]
+    fn khong_ai_phu_thuoc_web() {
+        let meta = json!({ "packages": [
+            pkg("cli", &[("web", None)]),
+            pkg("content", &[("web", None)]),
+            pkg("web", &[]),
+        ]});
+        assert_eq!(violations(&meta).len(), 2);
     }
 
     #[test]

@@ -1,0 +1,26 @@
+[package]
+name = "web"
+description = "Vỏ ứng dụng trên trình duyệt (Leptos CSR): chọn hoạt động, bộ hiển thị 2D, kết quả"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+kernel.workspace = true
+registry.workspace = true
+content.workspace = true
+kind-bars.workspace = true
+kind-choice.workspace = true
+kind-section.workspace = true
+lib-exact.workspace = true
+leptos.workspace = true
+wasm-bindgen.workspace = true
+web-sys.workspace = true
+
+[lints]
+workspace = true

@@ -7,6 +7,7 @@ members = [
     "crates/registry",
     "crates/content",
     "crates/cli",
+    "crates/web",
     "xtask",
 ]
 
@@ -31,6 +32,10 @@ serde = { version = "1", features = ["derive"] }
 thiserror = "2"
 serde_json = "1"
 toml = "0.9"
+# Chỉ cho `web` (ADR 0008); phiên bản đã đo trong spikes/leptos-bevy
+leptos = { version = "=0.8.23", features = ["csr"] }
+wasm-bindgen = "=0.2.130"
+web-sys = { version = "0.3", features = ["Window", "Performance", "Element", "DomRect", "MouseEvent", "EventTarget"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
@@ -41,3 +46,12 @@ unwrap_used = "warn"
 dbg_macro = "warn"
 todo = "warn"
 print_stdout = "warn"
+
+# Bản build wasm cho `web` (crates/web/build.sh): nhỏ gọn như spike đã đo (ADR 0008).
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false # wasm-opt bỏ tên; giữ section target_features cho wasm-bindgen
