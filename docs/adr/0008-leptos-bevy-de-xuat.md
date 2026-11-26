@@ -62,6 +62,12 @@ cd spikes/leptos-bevy && ./build.sh
 
 Phục vụ `dist/` qua HTTPS hoặc mạng LAN (vd. `python -m http.server -d dist 8080`), mở trên điện thoại Android 3–4 GB RAM với 4G (hoặc Chrome DevTools giới hạn "Fast 4G" + 4× CPU slowdown làm ước lượng), bật "Hiển thị 3D"; dòng chữ đầu trang ghi thời gian khởi tạo wasm và khung đầu tiên. Lưu ý `http.server` không gửi `.br`; số đo qua mạng thật cần máy chủ có nén brotli/gzip.
 
+**Bản đã đưa lên mạng:** <https://nam2341135.github.io/dyen/>. Đây là GitHub Pages, nhánh `gh-pages`, chứa bản build release dựng sẵn trên máy (không build bằng CI). Trang gồm cả `leptos-bevy` và `lang-map`, kèm hướng dẫn đo.
+
+- GitHub Pages chỉ nén **gzip**, không gửi brotli. Lượng tải thật lớn hơn số brotli ở trên khoảng 1,5 lần: `view3d` 4,4 MB (brotli 2,9 MB), `lang-map` 4,9 MB (brotli 3,1 MB), vỏ Leptos 0,1 MB. Vì vậy số đo qua Pages là trường hợp xấu hơn sản phẩm (sản phẩm sẽ phục vụ brotli). Nếu số này đạt ngưỡng thì điều kiện 2 đạt.
+- Đo thử trên máy đo qua Internet (2026-11-26): `leptos-bevy` 3,7 s từ lúc bật 3D tới khung đầu; `lang-map` 2,5 s từ lúc mở trang, 37 fps.
+- Sửa spike thì phải build lại và đẩy lại nhánh `gh-pages`.
+
 ## Phương án dự phòng
 
 Nếu (1) hoặc (2) không đạt: thay Bevy bằng renderer nhẹ hơn (`three-d`, hoặc `wgpu` với renderer tối giản tự viết). Nhờ [ADR 0002](0002-mot-mo-hinh-nhieu-bo-hien-thi.md), việc thay này không chạm logic.
