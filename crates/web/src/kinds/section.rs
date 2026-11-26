@@ -14,9 +14,13 @@ const HIDDEN: [&str; 3] = ["cd", "da", "dd1"];
 const GIVEN_NAMES: [&str; 3] = ["M", "N", "P"];
 
 /// Chiếu xiên một điểm của lập phương đơn vị vào `viewBox="0 0 400 380"`.
+///
+/// Chiều sâu vẽ chếch lên-phải như sách giáo khoa, nhưng ngắn (≈ 0,39, góc ≈ 40°): với tỉ lệ
+/// quen thuộc 0,5 / 45° thì mặt phẳng của hoạt động mẫu gần song song hướng nhìn và thiết diện
+/// lục giác chỉ còn một dải mảnh.
 pub fn project(p: [f64; 3]) -> (f64, f64) {
     let [x, y, z] = p;
-    (40.0 + 220.0 * (x + 0.5 * y), 330.0 - 220.0 * (z + 0.35 * y))
+    (37.0 + 250.0 * (x + 0.3 * y), 345.0 - 250.0 * (z + 0.25 * y))
 }
 
 fn project_vec(v: Vec3) -> (f64, f64) {
@@ -195,6 +199,42 @@ mod tests {
             assert!((15.0..=385.0).contains(&x), "x = {x} của {p:?}");
             assert!((15.0..=365.0).contains(&y), "y = {y} của {p:?}");
         }
+    }
+
+    /// Diện tích đa giác (công thức dây giày), đỉnh theo vòng.
+    fn area(pts: &[[f64; 3]]) -> f64 {
+        let q: Vec<(f64, f64)> = pts.iter().map(|p| project(*p)).collect();
+        let n = q.len();
+        (0..n)
+            .map(|i| {
+                let (a, b) = (q[i], q[(i + 1) % n]);
+                a.0 * b.1 - b.0 * a.1
+            })
+            .sum::<f64>()
+            .abs()
+            / 2.0
+    }
+
+    #[test]
+    fn luc_giac_mnp_khong_det() {
+        // Thiết diện của mặt phẳng x+y+z=3/2 (hoạt động mẫu) phải đủ rộng để thấy là lục giác:
+        // ít nhất 0,3 diện tích mặt trước trên hình vẽ (phép chiếu cũ chỉ được 0,11).
+        let hexagon = [
+            [1.0, 0.5, 0.0],
+            [1.0, 0.0, 0.5],
+            [0.5, 0.0, 1.0],
+            [0.0, 0.5, 1.0],
+            [0.0, 1.0, 0.5],
+            [0.5, 1.0, 0.0],
+        ];
+        let front = [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 0.0, 1.0],
+            [0.0, 0.0, 1.0],
+        ];
+        let ratio = area(&hexagon) / area(&front);
+        assert!(ratio >= 0.3, "lục giác chỉ bằng {ratio:.3} mặt trước");
     }
 
     #[test]
