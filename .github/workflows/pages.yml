@@ -1,0 +1,55 @@
+# Build vỏ `web` và đưa lên GitHub Pages ở thư mục `app/` của nhánh `gh-pages`
+# (https://nam2341135.github.io/dyen/app/) sau mỗi lần đẩy lên main.
+# Chỉ thay `app/`; các spike khác trên `gh-pages` giữ nguyên (đẩy tay, ADR 0008).
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cài toolchain theo rust-toolchain.toml
+        run: rustup toolchain install && rustc --version
+      - uses: Swatinem/rust-cache@v2
+      - name: Cài wasm-bindgen-cli đúng phiên bản trong Cargo.lock, wasm-opt, brotli
+        run: |
+          ver=$(awk '/^name = "wasm-bindgen"$/ {getline; gsub(/version = |"/, ""); print}' Cargo.lock)
+          echo "wasm-bindgen $ver"
+          cargo install wasm-bindgen-cli --version "$ver" --locked
+          bin=binaryen-version_133-x86_64-linux.tar.gz
+          curl -sSfLO "https://github.com/WebAssembly/binaryen/releases/download/version_133/$bin"
+          curl -sSfLO "https://github.com/WebAssembly/binaryen/releases/download/version_133/$bin.sha256"
+          sha256sum -c "$bin.sha256"
+          tar xzf "$bin" && echo "$PWD/binaryen-version_133/bin" >> "$GITHUB_PATH"
+          sudo apt-get update -q && sudo apt-get install -y -q brotli
+      - name: Build
+        run: bash crates/web/build.sh
+      - name: Đẩy lên gh-pages/app
+        run: |
+          git fetch --depth 1 origin gh-pages
+          git worktree add pages FETCH_HEAD
+          rm -rf pages/app && mkdir pages/app
+          cp crates/web/dist/index.html crates/web/dist/web.js crates/web/dist/web_bg.wasm pages/app/
+          cd pages
+          git add -A app
+          if git diff --cached --quiet; then echo "Không có gì thay đổi."; exit 0; fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "app: build từ ${GITHUB_SHA::7}"
+          git push origin HEAD:gh-pages
