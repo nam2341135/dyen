@@ -24,9 +24,20 @@ const RULES: &[(&str, &[&str], bool)] = &[
     // nên được phụ thuộc trực tiếp `kind-*` (ADR 0010).
     (
         "web",
-        &["kernel", "lib-*", "kind-*", "registry", "content"],
+        &[
+            "kernel",
+            "lib-*",
+            "kind-*",
+            "registry",
+            "content",
+            "room-model",
+        ],
         false,
     ),
+    // Phòng học 3D (ADR 0016): `room-model` thuần; `room3d` (Bevy) chỉ biết `room-model`,
+    // và `web` không phụ thuộc `room3d` (hai gói wasm riêng nói chuyện qua cầu nối).
+    ("room-model", &[], true),
+    ("room3d", &["room-model"], false),
     ("xtask", &[], false),
 ];
 
@@ -229,5 +240,31 @@ mod tests {
     fn bat_crate_chua_dang_ky() {
         let meta = json!({ "packages": [pkg("server", &[])] });
         assert_eq!(violations(&meta).len(), 1);
+    }
+
+    #[test]
+    fn room_model_la_crate_thuan() {
+        let ok = json!({ "packages": [pkg("room-model", &[("serde", None), ("serde_json", Some("dev"))])] });
+        assert!(violations(&ok).is_empty(), "{:?}", violations(&ok));
+        let bad = json!({ "packages": [pkg("room-model", &[("serde_json", None)])] });
+        assert_eq!(violations(&bad).len(), 1);
+    }
+
+    #[test]
+    fn web_khong_duoc_phu_thuoc_room3d() {
+        let ok =
+            json!({ "packages": [pkg("room-model", &[]), pkg("web", &[("room-model", None)])] });
+        assert!(violations(&ok).is_empty(), "{:?}", violations(&ok));
+        let bad = json!({ "packages": [pkg("room3d", &[]), pkg("web", &[("room3d", None)])] });
+        assert_eq!(violations(&bad).len(), 1);
+    }
+
+    #[test]
+    fn room3d_chi_phu_thuoc_room_model() {
+        let ok =
+            json!({ "packages": [pkg("room-model", &[]), pkg("room3d", &[("room-model", None)])] });
+        assert!(violations(&ok).is_empty(), "{:?}", violations(&ok));
+        let bad = json!({ "packages": [pkg("kernel", &[]), pkg("room3d", &[("kernel", None)])] });
+        assert_eq!(violations(&bad).len(), 1);
     }
 }

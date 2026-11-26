@@ -1178,6 +1178,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "room-model"
+version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "room3d"
+version = "0.0.0"
+
+[[package]]
 name = "rstml"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

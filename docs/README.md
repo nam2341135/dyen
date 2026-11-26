@@ -28,6 +28,7 @@ Muốn hiểu dự án, đọc theo thứ tự này:
 | [0013](adr/0013-quy-uoc-bo-hien-thi.md) | Quy ước chung cho bộ hiển thị: vùng chạm, animation, kiểu dáng | Chấp nhận |
 | [0014](adr/0014-luu-bai-lam-cuc-bo.md) | Lưu bài làm cục bộ, ẩn danh, trên máy người học | Đề xuất |
 | [0015](adr/0015-ngon-ngu-thiet-ke-giay-muc.md) | Ngôn ngữ thiết kế "giấy và mực", nút nổi | Đề xuất |
+| [0016](adr/0016-trang-chu-phong-hoc-3d.md) | Trang chủ là phòng học 3D | Chấp nhận |
 
 Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, cập nhật bảng này.
 

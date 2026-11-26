@@ -8,6 +8,8 @@ members = [
     "crates/content",
     "crates/cli",
     "crates/web",
+    "crates/room-model",
+    "crates/room3d",
     "xtask",
 ]
 
@@ -27,6 +29,7 @@ kind-section = { path = "crates/kinds/section" }
 lib-exact = { path = "crates/libs/exact" }
 registry = { path = "crates/registry" }
 content = { path = "crates/content" }
+room-model = { path = "crates/room-model" }
 # Bên ngoài (crate thuần chỉ được dùng serde, thiserror — ADR 0006)
 serde = { version = "1", features = ["derive"] }
 thiserror = "2"
