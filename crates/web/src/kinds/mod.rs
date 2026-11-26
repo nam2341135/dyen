@@ -53,3 +53,12 @@ pub fn footer<K: Kind + 'static>(
         <p><button class="secondary" on:click=retry>"Làm lại"</button></p>
     }
 }
+
+/// Hằng số đo vùng chạm dùng chung cho test của các bộ hiển thị (ADR 0013).
+#[cfg(test)]
+pub(crate) mod tests {
+    /// Bề rộng hình SVG trên màn 360 px (trừ lề 16 px mỗi bên của `main`).
+    pub const PHONE_SVG_PX: f64 = 328.0;
+    /// Cạnh nhỏ nhất của một vùng bấm trong hình, px CSS (WCAG 2.5.8).
+    pub const MIN_TARGET_PX: f64 = 24.0;
+}

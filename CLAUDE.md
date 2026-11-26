@@ -42,6 +42,7 @@ Không báo "xong" khi chưa chạy `cargo xtask ci` và thấy nó qua. Nếu n
 ## Quy tắc logic (ADR 0002, 0003)
 
 - Bộ hiển thị (2D/3D) **không** giữ hay sửa trạng thái học tập. Chỉ vẽ `State` và phát `Input`.
+- Bộ hiển thị theo ADR 0013: vùng bấm ≥ 24 px ở màn 360 px (có test), nút ≥ 44 px; animation không bao giờ chặn đầu vào; màu chỉ là biến CSS, code Rust chỉ sinh `class`.
 - `apply` / `replay` phải tất định. Dùng số nguyên hoặc phân số hữu tỉ cho mọi quyết định logic; `f32/f64` chỉ dùng cho hiển thị.
 - Không dùng `HashMap`/`HashSet` ở nơi thứ tự duyệt ảnh hưởng kết quả — dùng `BTreeMap`/`Vec`.
 - Định dạng dấu vết có số phiên bản; thay đổi phá tương thích phải tăng phiên bản và giữ đường đọc bản cũ.
