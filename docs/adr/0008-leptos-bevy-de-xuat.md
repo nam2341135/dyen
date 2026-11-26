@@ -35,6 +35,16 @@ Máy đo: Windows 11, Intel Iris Xe, Chrome (WebGL2 qua ANGLE/D3D11). Build: `op
 
 Kích thước vỏ Leptos (2D + `kernel` + `kind-bars`): **86 KB brotli** (+ 5 KB JS) — trang 2D không phải chờ 3D.
 
+### Cảnh đầy đủ: [`spikes/lang-map`](../../spikes/lang-map) (đo độ hoàn thiện tối đa)
+
+Cảnh làng 3D dựng hoàn toàn bằng code: đình, nhà, cây, sông, ruộng; chu kỳ ngày đêm, bloom, bóng; thuyền, người, trâu, chim, khói, đom đóm. Đo trên cùng máy, canvas 1920×970:
+
+- Gói **3,13 MB brotli**, chỉ hơn cảnh tối thiểu 0,24 MB. Vẫn dưới ngưỡng 5 MB của điều kiện 1.
+- Khung đầu **0,35 s** sau `start()` (1,8 s lần đầu do biên dịch shader). Cần `opt-level=3` cho crate cảnh: với `opt-level="z"` khung đầu là 5,7 s.
+- Chất lượng cao (bloom, MSAA 4×, bóng): **33–35 fps**. Chất lượng thấp: **~51 fps**. Giới hạn bởi GPU (Iris Xe).
+- Chưa đo 4× CPU slowdown và điện thoại. Điều kiện 2 vẫn **chờ**.
+- Shader Bevy 0.20 viết bằng WESL; spike làm hoạt cảnh trên CPU (~4 ms/khung cho nước và lúa). Sản phẩm nên dùng shader đỉnh.
+
 ### Ghi chú kỹ thuật
 
 - Bộ feature Bevy tối thiểu (không `default`): xem `spikes/bevy-min/Cargo.toml`.

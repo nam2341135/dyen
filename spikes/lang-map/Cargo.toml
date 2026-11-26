@@ -1,0 +1,62 @@
+[package]
+name = "lang-map"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Spike — ngoài workspace chính (spikes/README.md). Xem THIET-KE.md.
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "lang-map"
+path = "src/main.rs"
+
+[dependencies]
+bevy = { version = "=0.20.1", default-features = false, features = [
+    "std",
+    "async_executor",
+    "bevy_asset",
+    "bevy_log",
+    "bevy_winit",
+    "bevy_window",
+    "webgl2",
+    "web",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_post_process",
+    "bevy_pbr",
+    "bevy_light",
+    "bevy_camera",
+    "bevy_mesh",
+    "bevy_material",
+    "bevy_shader",
+    "bevy_color",
+    "keyboard",
+    "mouse",
+    "touch",
+] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.130"
+
+# Lặp nhanh: tối ưu vừa, không LTO.
+[profile.fast]
+inherits = "release"
+opt-level = 2
+lto = false
+codegen-units = 16
+incremental = true
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false # wasm-opt bỏ tên; giữ section target_features cho wasm-bindgen
+
+# Mã cảnh (dựng lưới thủ tục + hoạt cảnh CPU) cần tốc độ; Bevy vẫn opt-z cho gọn.
+[profile.release.package.lang-map]
+opt-level = 3

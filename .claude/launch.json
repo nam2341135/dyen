@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lang-map",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "-d", "spikes/lang-map/dist", "8090"],
+      "port": 8090
+    }
+  ]
+}
