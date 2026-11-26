@@ -49,7 +49,7 @@ Snapshot ở `crates/cli/tests/traces/` giữ định dạng dấu vết `format
 - `lib-*` (`crates/libs/<tên>`, ADR 0012): thư viện thuần dùng chung cho các `kind-*` (ví dụ `lib-exact`: số hữu tỉ, hình học chính xác).
   - Không biết `Kind`, dấu vết, nhãn hay sư phạm; chỉ phụ thuộc `lib-*` khác.
   - Chỉ thêm khi có ít nhất 2 loại dùng (hoặc 1 loại + 1 loại sắp làm đã có bản nháp), và ghi tên crate trong ADR.
-- **Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`): không IO, không mạng, không đồng hồ, không thread, không số ngẫu nhiên không seed. Chỉ dùng phụ thuộc ngoài có trong danh sách cho phép ở `xtask/src/deps.rs`.
+- **Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`, `room-model`): không IO, không mạng, không đồng hồ, không thread, không số ngẫu nhiên không seed. Chỉ dùng phụ thuộc ngoài có trong danh sách cho phép ở `xtask/src/deps.rs`.
 - Muốn thêm phụ thuộc vào crate thuần: hỏi trước. Nếu được đồng ý, sửa danh sách trong `xtask/src/deps.rs` và cập nhật ADR 0006.
 - Thêm crate mới: cập nhật cả ADR 0006 và `xtask/src/deps.rs` trong cùng thay đổi. Ngoại lệ: loại hoạt động mới `crates/kinds/<tên>` (crate `kind-<tên>`) tự khớp quy tắc `kind-*`.
 
@@ -73,7 +73,7 @@ Snapshot ở `crates/cli/tests/traces/` giữ định dạng dấu vết `format
 
 ## Dữ liệu trẻ em (ADR 0005)
 
-- Không thêm trường thông tin cá nhân nào (email, SĐT, ngày sinh, ảnh, giọng nói, chữ tự do của trẻ) khi chưa có ADR cho phép.
+- Không thêm trường thông tin cá nhân nào (email, SĐT, ngày sinh, ảnh, giọng nói) khi chưa có ADR cho phép.
 - Không thêm thư viện analytics/tracking/CDN bên thứ ba vào bất kỳ phần nào học sinh dùng.
 
 ## Phong cách

@@ -28,7 +28,7 @@ Sẽ thêm sau (chưa tạo): `table3d` (Bevy), `server` (Axum). `web` không đ
 
 `web` được phụ thuộc trực tiếp `kind-*` vì bộ hiển thị 2D cần kiểu `State`/`Input` của từng loại (ADR 0010). Không crate nào được phụ thuộc `web`.
 
-**Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`) không được phụ thuộc thư viện bên ngoài nào ngoài danh sách cho phép trong `xtask/src/deps.rs` (hiện tại: `serde`, `thiserror` và phụ thuộc bắc cầu của chúng). Không IO, không mạng, không đồng hồ, không thread.
+**Crate thuần** (`kernel`, `lib-*`, `kind-*`, `registry`, `room-model`) không được phụ thuộc thư viện bên ngoài nào ngoài danh sách cho phép trong `xtask/src/deps.rs` (hiện tại: `serde`, `thiserror` và phụ thuộc bắc cầu của chúng). Không IO, không mạng, không đồng hồ, không thread.
 
 `cargo xtask deps` kiểm tra bảng trên bằng `cargo metadata`; chạy trong `cargo xtask ci`.
 
