@@ -22,6 +22,9 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 - **Nâng `actions/checkout` v4 → v7** (Node 24, hết cảnh báo Node 20). Nhánh `ci/checkout-v7`, PR #6, xếp chồng lên PR #5. Chọn v7 vì lỗi push từ `git worktree` của v6.0.0 (`pages.yml` dùng) đã sửa ở v6.0.1. Còn:
   - người duyệt và merge, sau PR #5;
   - sau khi merge vào `main`: xem lần chạy `pages` đầu tiên đẩy được lên `gh-pages`. PR không chạy được workflow này. Nếu đỏ ở bước "Đẩy lên gh-pages/app" thì đó là credential của checkout; đặt lại `@v4` rồi báo.
+- **ADR 0014, lưu bài làm cục bộ** (trạng thái "Đề xuất"). Nhánh `docs/adr-luu-bai-lam`, PR #7, xếp chồng lên PR #6. Chỉ có tài liệu, chưa có code. Còn:
+  - người duyệt ADR (xem "Chờ người quyết");
+  - nếu chấp nhận: sửa ADR 0004 trỏ về ADR 0014, sửa định nghĩa `Attempt` trong glossary, rồi thêm việc "làm lưu bài làm" vào "Tiếp theo".
 
 ## Chờ người quyết
 
@@ -31,7 +34,11 @@ Việc AI không tự làm được hoặc không được tự quyết.
 - Duyệt và merge PR #4, rồi thử vỏ web trên iPhone thật: vùng bấm, nút 44 px.
 - Đo thời gian tải trên một điện thoại Android tầm trung. Đây là nợ từ spike ADR 0008; mới đo iPhone 12.
 - ADR 0005: phần pháp lý (luật Việt Nam về dữ liệu trẻ em) chưa xác minh với người có chuyên môn.
-- Có lưu bài làm (`Attempt`) không, và lưu ở đâu. Cần một ADR (mục 2 ở "Tiếp theo") trước khi làm bất cứ gì có lưu trữ.
+- Duyệt [ADR 0014](adr/0014-luu-bai-lam-cuc-bo.md) (lưu bài làm cục bộ, ẩn danh). Cần quyết:
+  - chấp nhận "bản chép cấu hình" thay cho "số phiên bản" của ADR 0004;
+  - chỉ lưu phiên đã xong, giữ tối đa 500 bài làm.
+
+  Chưa làm gì có lưu trữ trước khi ADR này được chấp nhận.
 
 ## Tiếp theo
 
@@ -41,20 +48,18 @@ Theo thứ tự. "Làm tiếp" mà không có mục dở dang ở "Đang làm" t
    - Xong khi: vỏ web không phát `Input` khi `Session` đã xong.
    - Có test đơn vị.
    - ADR 0013 vẫn đúng: không khoá vì animation, chỉ khoá vì phiên đã kết thúc.
-2. **Viết ADR lưu bài làm**: cục bộ, ẩn danh trước, theo ADR 0005.
-   - Xong khi: ADR ở trạng thái "Đề xuất", nằm trong bảng ở `docs/README.md`, và mục tương ứng ở "Chờ người quyết" trỏ tới nó.
-3. **Bố cục và giao diện vỏ web.** Gồm trang danh mục, thanh tiêu đề, trang kết quả. Chỉ sửa stylesheet và cấu trúc theo ADR 0013.
+2. **Bố cục và giao diện vỏ web.** Gồm trang danh mục, thanh tiêu đề, trang kết quả. Chỉ sửa stylesheet và cấu trúc theo ADR 0013.
    - Xong khi: có bản thiết kế được duyệt, thử ở 360 px.
-4. **Ghim phiên bản Rust chính xác** trong `rust-toolchain.toml`. Đây là nợ ghi ở ADR 0007, đến hạn vì đã có CI.
+3. **Ghim phiên bản Rust chính xác** trong `rust-toolchain.toml`. Đây là nợ ghi ở ADR 0007, đến hạn vì đã có CI.
    - Xong khi: CI và máy cục bộ dùng cùng một bản, ADR 0007 ghi đã làm.
-5. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
+4. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
    - Xong khi: CI đỏ nếu `web_bg.wasm` sau `wasm-opt` vượt ngưỡng ghi trong `crates/web/README.md`.
 
 ## Nợ đã biết
 
 - `bars` tự do: hai vết cắt người học đặt quá sát nhau cho vùng bấm < 24 px (ghi ở ADR 0013).
 - GitHub Pages chỉ nén gzip, không brotli. Lượng tải thật lớn hơn số đo trong `crates/web/README.md`.
-- `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 5 ở "Tiếp theo").
+- `README.md` của `crates/web` liệt kê kích thước đo tay. Chưa có máy kiểm (mục 4 ở "Tiếp theo").
 
 ## Đã xong gần đây
 
