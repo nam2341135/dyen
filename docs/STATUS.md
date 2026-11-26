@@ -83,9 +83,11 @@ Theo thứ tự. "Làm tiếp" mà không có mục dở dang ở "Đang làm" t
 
 1. **Ngân sách kích thước wasm** trong `cargo xtask` (ADR 0007).
    - Xong khi: CI đỏ nếu `web_bg.wasm` sau `wasm-opt` vượt ngưỡng ghi trong `crates/web/README.md`.
-2. **Phòng học 3D, mốc 2:** note tương tác, huy chương thật, đồ trong phòng đổi theo tiến độ. Cần ADR 0014 (lưu bài làm) được chấp nhận trước.
+2. **Phòng 3D hiện khung đầu nhanh hơn.** Lần mở đầu tiên đang khoảng 11 s trên Chrome máy tính (ngân sách 3 s), phần lớn là biên dịch wasm 30 MB. Hướng thử: wasm nhỏ hơn (bỏ bớt tính năng Bevy, `wasm-opt -Oz`), biên dịch dạng luồng (`instantiateStreaming`), nạp phòng sau khi danh sách chữ đã hiện.
+   - Xong khi: khung đầu lần mở đầu ≤ 3 s trên Chrome máy tính và đã đo trên một điện thoại Android tầm trung, số đo ghi trong `crates/room3d/README.md`.
+3. **Phòng học 3D, mốc 2:** note tương tác, huy chương thật, đồ trong phòng đổi theo tiến độ. Cần ADR 0014 (lưu bài làm) được chấp nhận trước.
    - Xong khi: huy chương và note lấy từ bài làm đã lưu, có test, thử ở 360 px.
-3. **Phòng học 3D, mốc 3:** trang trí phòng, kéo thả đồ.
+4. **Phòng học 3D, mốc 3:** trang trí phòng, kéo thả đồ.
    - Xong khi: có bản thiết kế riêng được duyệt, rồi làm theo nó.
 
 ## Nợ đã biết
