@@ -5,7 +5,8 @@
 use kind_bars::{Bars, Config, Input, PieceId, Relation, State, TICKS, Task};
 use leptos::prelude::*;
 
-use super::{PlaySignal, act, footer, start};
+use super::{PlaySignal, footer, start};
+use crate::{clock, play::Play};
 
 /// Bề rộng `viewBox`.
 const VIEW_W: f64 = 600.0;
@@ -42,6 +43,29 @@ fn y_of(bar: u8) -> f64 {
     20.0 + STRIP_H + ROW * f64::from(bar)
 }
 
+/// Phiên đã kết thúc: người học bấm "Xong", hoặc trả lời so sánh đúng.
+///
+/// Trả lời so sánh sai thì chưa kết thúc: người học còn sửa được, và cách đánh giá
+/// ghi nhận việc sửa (điểm một nửa, `recovered`).
+pub fn ended(play: &Play<Bars>) -> bool {
+    match play.last_input() {
+        Some(Input::Done) => true,
+        Some(Input::Compare { .. }) => play.outcome().is_some_and(|o| o.completed),
+        _ => false,
+    }
+}
+
+/// Gửi một đầu vào của người học; bỏ qua nếu phiên đã kết thúc ([`ended`]).
+fn act(play: PlaySignal<Bars>, input: Input) {
+    if play.with_untracked(ended) {
+        return;
+    }
+    let now = clock::now_ms();
+    play.update(|p| {
+        p.act_unless(now, input, ended);
+    });
+}
+
 /// Vẽ một hoạt động `bars`.
 pub fn view(config: Config) -> AnyView {
     start::<Bars>(config, body)
@@ -54,6 +78,7 @@ fn body(play: PlaySignal<Bars>) -> AnyView {
     });
     let height = y_of(bars) + BAR_H + 10.0;
     let figure = move || play.with(|p| figure(play, p.state(), bars, freehand));
+    let locked = move || play.with(ended);
     let hint = if freehand {
         Some("Chạm vào dải xám phía trên thanh để cắt; chạm nút trên vết cắt để nối lại.")
     } else if partitions.is_empty() {
@@ -70,7 +95,10 @@ fn body(play: PlaySignal<Bars>) -> AnyView {
                 .iter()
                 .map(|&parts| {
                     view! {
-                        <button on:click=move |_| act(play, Input::Partition { bar, parts })>
+                        <button
+                            on:click=move |_| act(play, Input::Partition { bar, parts })
+                            disabled=locked
+                        >
                             {format!("Chia {parts}")}
                         </button>
                     }
@@ -83,7 +111,12 @@ fn body(play: PlaySignal<Bars>) -> AnyView {
         Task::Compare { left, right } => {
             let rel = move |r: Relation, label: &'static str| {
                 view! {
-                    <button on:click=move |_| act(play, Input::Compare { answer: r })>{label}</button>
+                    <button
+                        on:click=move |_| act(play, Input::Compare { answer: r })
+                        disabled=locked
+                    >
+                        {label}
+                    </button>
                 }
             };
             Some(view! {
@@ -99,11 +132,18 @@ fn body(play: PlaySignal<Bars>) -> AnyView {
         Task::Partition { .. } => None,
     };
     view! {
-        <svg class="bars" viewBox=format!("0 0 {VIEW_W} {height}") width="100%">{figure}</svg>
+        <svg
+            class="bars"
+            class:locked=locked
+            viewBox=format!("0 0 {VIEW_W} {height}") width="100%">{figure}</svg>
         {hint}
         {partition_buttons}
         {answer}
-        <p><button on:click=move |_| act(play, Input::Done)>"Xong"</button></p>
+        <p>
+            <button on:click=move |_| act(play, Input::Done) disabled=locked>
+                "Xong"
+            </button>
+        </p>
         {footer(play, |p| matches!(p.last_input(), Some(Input::Compare { .. } | Input::Done)))}
     }
     .into_any()
@@ -281,6 +321,7 @@ fn strip_tick(ev: &leptos::ev::MouseEvent) -> Option<u32> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::play::Play;
 
     #[test]
     fn tick_at_lam_tron_va_kep() {
@@ -329,6 +370,58 @@ mod tests {
             kind_bars::MAX_PARTS,
             px(piece)
         );
+    }
+
+    fn play(task: Task) -> Play<Bars> {
+        let config = Config {
+            bars: 2,
+            freehand: false,
+            partitions: vec![2, 3],
+            task,
+        };
+        Play::new(config, 0).expect("cấu hình hợp lệ")
+    }
+
+    fn compare() -> Task {
+        Task::Compare {
+            left: "1/2".parse().expect("phân số"),
+            right: "1/3".parse().expect("phân số"),
+        }
+    }
+
+    #[test]
+    fn xong_thi_ket_thuc() {
+        let mut p = play(Task::Partition { bar: 0, parts: 2 });
+        assert!(!ended(&p));
+        p.act(1, Input::Partition { bar: 0, parts: 2 });
+        assert!(!ended(&p));
+        p.act(2, Input::Done);
+        assert!(ended(&p));
+    }
+
+    #[test]
+    fn so_sanh_sai_van_duoc_tra_loi_lai() {
+        let mut p = play(compare());
+        p.act(
+            1,
+            Input::Compare {
+                answer: Relation::Less,
+            },
+        );
+        assert!(
+            !ended(&p),
+            "sai thì còn sửa được (điểm một nửa, `recovered`)"
+        );
+        p.act(
+            2,
+            Input::Compare {
+                answer: Relation::Greater,
+            },
+        );
+        assert!(ended(&p));
+        // Vỏ không phát thêm đầu vào: dấu vết giữ nguyên.
+        assert!(!p.act_unless(3, Input::Done, ended));
+        assert_eq!(p.steps(), 2);
     }
 
     #[test]
