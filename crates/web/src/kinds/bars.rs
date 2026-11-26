@@ -140,7 +140,7 @@ fn body(play: PlaySignal<Bars>) -> AnyView {
         {partition_buttons}
         {answer}
         <p>
-            <button on:click=move |_| act(play, Input::Done) disabled=locked>
+            <button class="primary" on:click=move |_| act(play, Input::Done) disabled=locked>
                 "Xong"
             </button>
         </p>

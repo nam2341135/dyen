@@ -37,6 +37,14 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
   Đã thử ở 360 px, CI xanh. Còn: người duyệt giao diện và merge, sau PR #9.
 
+- **Ngôn ngữ thiết kế "giấy và mực", nút nổi** ([ADR 0015](adr/0015-ngon-ngu-thiet-ke-giay-muc.md), "Đề xuất"). Nhánh `feat/phong-cach-giay-muc`, xếp chồng lên PR #10. Chủ dự án chọn hướng này sau khi xem ba bản phác. Đã xong:
+  - bộ biến màu mới và bản tối (`prefers-color-scheme`);
+  - màu mảnh `bars` theo Okabe–Ito;
+  - tiêu đề serif dùng font có sẵn trên máy;
+  - nút nổi, và lớp `primary` cho Nộp, Cắt, Xong.
+
+  Đã thử ở 360 px, sáng và tối. Còn: người duyệt giao diện; chấp nhận ADR 0015; merge sau PR #10.
+
 ## Chờ người quyết
 
 Việc AI không tự làm được hoặc không được tự quyết.
