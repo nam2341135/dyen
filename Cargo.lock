@@ -5134,6 +5134,7 @@ dependencies = [
  "room-model",
  "serde_json",
  "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

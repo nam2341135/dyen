@@ -4,6 +4,7 @@
 pub mod ctl;
 pub mod flight;
 pub mod fps;
+pub mod inbox;
 pub mod poses;
 pub mod sky;
 

@@ -21,6 +21,8 @@ bevy = { version = "=0.20.1", default-features = false, features = ["std"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen.workspace = true
+# Đọc performance.now (đo khung đầu), bỏ tabindex của canvas.
+web-sys.workspace = true
 bevy = { version = "=0.20.1", default-features = false, features = [
     "std",
     "async_executor",

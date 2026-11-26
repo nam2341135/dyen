@@ -20,40 +20,40 @@ pub struct SkyState {
 
 /// Sáng (6–10 giờ).
 pub const MORNING: SkyState = SkyState {
-    top: [0.30, 0.55, 0.95],
-    bottom: [1.00, 0.80, 0.60],
-    sun_color: [1.00, 0.88, 0.70],
-    sun_lux: 6000.0,
-    lamp_lumens: 400.0,
+    top: [0.45, 0.62, 0.90],
+    bottom: [1.00, 0.76, 0.58],
+    sun_color: [1.00, 0.85, 0.68],
+    sun_lux: 1500.0,
+    lamp_lumens: 500.0,
     stars: 0.0,
 };
 
 /// Trưa (10–16 giờ).
 pub const NOON: SkyState = SkyState {
-    top: [0.25, 0.55, 1.00],
-    bottom: [0.70, 0.88, 1.00],
-    sun_color: [1.00, 0.98, 0.92],
-    sun_lux: 10000.0,
-    lamp_lumens: 100.0,
+    top: [0.38, 0.60, 0.92],
+    bottom: [0.75, 0.86, 0.96],
+    sun_color: [1.00, 0.96, 0.88],
+    sun_lux: 2500.0,
+    lamp_lumens: 300.0,
     stars: 0.0,
 };
 
 /// Chiều tà (16–19 giờ).
 pub const DUSK: SkyState = SkyState {
-    top: [0.35, 0.25, 0.60],
-    bottom: [1.00, 0.45, 0.25],
-    sun_color: [1.00, 0.60, 0.35],
-    sun_lux: 3000.0,
+    top: [0.36, 0.27, 0.58],
+    bottom: [0.98, 0.52, 0.36],
+    sun_color: [1.00, 0.62, 0.40],
+    sun_lux: 900.0,
     lamp_lumens: 900.0,
     stars: 0.0,
 };
 
 /// Đêm (19–6 giờ).
 pub const NIGHT: SkyState = SkyState {
-    top: [0.02, 0.03, 0.10],
-    bottom: [0.06, 0.08, 0.20],
-    sun_color: [0.40, 0.50, 1.00],
-    sun_lux: 200.0,
+    top: [0.03, 0.04, 0.12],
+    bottom: [0.08, 0.09, 0.22],
+    sun_color: [0.45, 0.55, 1.00],
+    sun_lux: 60.0,
     lamp_lumens: 1600.0,
     stars: 1.0,
 };

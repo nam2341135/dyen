@@ -59,3 +59,19 @@ lto = "fat"
 codegen-units = 1
 panic = "abort"
 strip = false # wasm-opt bỏ tên; giữ section target_features cho wasm-bindgen
+
+# Phòng 3D (room3d, ADR 0016): opt-level 3, không "z" (spike lang-map: "z" làm khung đầu chậm 16 lần).
+[profile.room-release]
+inherits = "release"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = false # như wasm-release: giữ section target_features cho wasm-bindgen
+
+# Lặp nhanh phòng 3D: code của dự án không tối ưu, thư viện (Bevy) tối ưu để chạy được mượt.
+[profile.room-dev]
+inherits = "dev"
+
+[profile.room-dev.package."*"]
+opt-level = 3
