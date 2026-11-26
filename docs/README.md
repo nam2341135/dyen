@@ -26,6 +26,7 @@ Muốn hiểu dự án, đọc theo thứ tự này:
 | [0011](adr/0011-nhan-tu-cau-hinh.md) | Loại hoạt động công bố thêm nhãn từ cấu hình | Chấp nhận |
 | [0012](adr/0012-toan-chinh-xac.md) | Tầng thư viện thuần `lib-*` và toán chính xác `lib-exact` | Chấp nhận |
 | [0013](adr/0013-quy-uoc-bo-hien-thi.md) | Quy ước chung cho bộ hiển thị: vùng chạm, animation, kiểu dáng | Chấp nhận |
+| [0014](adr/0014-luu-bai-lam-cuc-bo.md) | Lưu bài làm cục bộ, ẩn danh, trên máy người học | Đề xuất |
 
 Thêm ADR mới: chép [0000-mau.md](adr/0000-mau.md), đánh số tiếp theo, cập nhật bảng này.
 
