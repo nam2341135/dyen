@@ -53,6 +53,27 @@ pub fn shell_view(prev: ShellView, msg: &FromRoom) -> ShellView {
     }
 }
 
+/// Màn phòng lúc mở trang: bật "Phòng đơn giản" thì không có 3D, ngược lại đang nạp.
+pub fn initial_view(simple: bool) -> ShellView {
+    ShellView {
+        three_d: if simple { ThreeD::Off } else { ThreeD::Loading },
+        label: None,
+    }
+}
+
+/// Màn phòng khi bắt đầu nạp `room3d` (kể cả khi trước đó là `Off` vì "Phòng đơn giản").
+pub fn begin_load(prev: ShellView) -> ShellView {
+    ShellView {
+        three_d: ThreeD::Loading,
+        ..prev
+    }
+}
+
+/// Canvas bị ẩn: "Phòng đơn giản" đang bật hoặc không có 3D.
+pub fn canvas_hidden(simple: bool, three_d: ThreeD) -> bool {
+    simple || three_d == ThreeD::Off
+}
+
 /// Trạng thái của màn phòng (toàn signal, nên `Copy`): máy chuyển cảnh, lớp phủ, phòng 3D
 /// và các lựa chọn của người dùng.
 #[derive(Clone, Copy)]
@@ -76,10 +97,7 @@ impl Shell {
             tr: RwSignal::new(Transition::new(room::reduced_motion())),
             overlay: RwSignal::new(None),
             opening: RwSignal::new(false),
-            view: RwSignal::new(ShellView {
-                three_d: if simple { ThreeD::Off } else { ThreeD::Loading },
-                label: None,
-            }),
+            view: RwSignal::new(initial_view(simple)),
             simple: RwSignal::new(simple),
             quality: RwSignal::new(room::current_quality()),
             menu_open: RwSignal::new(false),
@@ -156,6 +174,7 @@ impl Shell {
             return;
         }
         self.loaded.set_value(true);
+        self.view.update(|v| *v = begin_load(v.clone()));
         room::load(&ToRoom::Init {
             hour: room::hour_now(),
             quality: self.quality.get_untracked(),
@@ -256,7 +275,7 @@ impl Default for Shell {
 pub fn backdrop(shell: Shell, route: RwSignal<Route>) -> impl IntoView {
     let still_broken = RwSignal::new(false);
     let ready = move || shell.running();
-    let canvas_hidden = move || shell.simple.get() || shell.view.with(|v| v.three_d == ThreeD::Off);
+    let canvas_hidden = move || canvas_hidden(shell.simple.get(), shell.view.with(|v| v.three_d));
     let loading = move || {
         route.get() == Route::Room
             && !shell.simple.get()
@@ -358,6 +377,24 @@ mod tests {
     fn that_bai_truoc_khung_dau_tat_3d() {
         let v = shell_view(start(), &FromRoom::Failed("không có WebGL2".to_owned()));
         assert_eq!(v.three_d, ThreeD::Off);
+    }
+
+    #[test]
+    fn tat_phong_don_gian_thi_canvas_hien_lai() {
+        // Mở trang khi "Phòng đơn giản" bật, rồi tắt: nạp 3D vào canvas đang hiện.
+        let v = initial_view(true);
+        assert_eq!(v.three_d, ThreeD::Off);
+        assert!(canvas_hidden(true, v.three_d));
+        let v = begin_load(v);
+        assert_eq!(v.three_d, ThreeD::Loading);
+        assert!(!canvas_hidden(false, v.three_d));
+        // Đã nạp xong trước khi bật rồi tắt: vẫn `Ready`, canvas hiện lại.
+        let v = shell_view(v, &FromRoom::FirstFrame);
+        assert!(canvas_hidden(true, v.three_d));
+        assert!(!canvas_hidden(false, v.three_d));
+        // Lỗi thật thì vẫn ẩn.
+        let v = shell_view(v, &FromRoom::Failed("x".to_owned()));
+        assert!(canvas_hidden(false, v.three_d));
     }
 
     #[test]

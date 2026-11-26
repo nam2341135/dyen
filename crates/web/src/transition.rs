@@ -218,13 +218,18 @@ impl Transition {
                 Some(z) => {
                     self.phase = Leaving(z);
                     self.generation = self.generation.wrapping_add(1);
-                    vec![
-                        Effect::Overlay(Some((z, OverlayStep::Out))),
+                    let mut fx = Vec::with_capacity(5);
+                    // Đang bay thì lớp phủ chưa hiện: không chớp màu khu lên rồi mờ đi.
+                    if !matches!(phase, Flying(_)) {
+                        fx.push(Effect::Overlay(Some((z, OverlayStep::Out))));
+                    }
+                    fx.extend([
                         Effect::Navigate(Route::Room),
                         Effect::Send(ToRoom::Resume),
                         Effect::Send(ToRoom::ReturnFrom(z)),
                         Effect::After(self.d_out(), Ev::Revealed),
-                    ]
+                    ]);
+                    fx
                 }
                 None => Vec::new(),
             },
@@ -359,9 +364,14 @@ mod tests {
                 Effect::Navigate(Route::Room),
                 Effect::Send(ToRoom::Resume),
                 Effect::Send(ToRoom::ReturnFrom(z)),
+                Effect::After(200, Ev::Revealed),
             ] {
                 assert!(fx.contains(&want), "{setup:?}: {fx:?}");
             }
+            // Đang bay thì chưa có lớp phủ: không chớp màu khu lên rồi mờ đi.
+            let out = Effect::Overlay(Some((z, OverlayStep::Out)));
+            let flying = setup.len() == 1;
+            assert_eq!(fx.contains(&out), !flying, "{setup:?}: {fx:?}");
             assert_eq!(t.phase, Phase::Leaving(z), "{setup:?}");
             assert_eq!(t.on(Ev::Revealed), vec![Effect::Overlay(None)]);
             assert_eq!(t.phase, Phase::Idle, "{setup:?}");
