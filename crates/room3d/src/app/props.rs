@@ -265,8 +265,9 @@ fn note_board(k: &mut Kit) {
     }
 }
 
-/// Kệ huy chương: tấm gỗ, bốn móc; ba móc treo bóng mờ huy chương chưa mở, móc cuối treo vé
-/// "Ngày đầu tới lớp".
+/// Kệ huy chương: tấm gỗ, bốn móc dồn về phía cửa sổ (nửa phải của kệ ra ngoài khung hình ở
+/// màn 360 px); móc đầu, sát cửa sổ, treo vé "Ngày đầu tới lớp", ba móc sau treo bóng mờ huy
+/// chương chưa mở.
 fn medal_shelf(k: &mut Kit) {
     let c = 0.20;
     k.part(
@@ -290,14 +291,19 @@ fn medal_shelf(k: &mut Kit) {
         ..default()
     });
     for i in 0..4 {
-        let x = -0.21 + i as f32 * 0.14;
+        // Vé rộng 0,12 m ở móc đầu; huy chương (đường kính 0,07 m) xếp sát nhau sau đó.
+        let x = if i == 0 {
+            -0.22
+        } else {
+            -0.12 + (i - 1) as f32 * 0.075
+        };
         k.part(
             Cylinder::new(0.005, 0.03),
             "metal",
             Transform::from_xyz(x, hook_y, 0.03)
                 .with_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
         );
-        if i < 3 {
+        if i > 0 {
             // Dây đeo và mặt huy chương, mờ.
             let ribbon = k.with_mat(
                 Cuboid::new(0.025, 0.09, 0.003),
@@ -326,7 +332,7 @@ fn medal_shelf(k: &mut Kit) {
                 img,
                 128,
                 80,
-                Transform::from_xyz(x - 0.01, hook_y - 0.06, 0.035)
+                Transform::from_xyz(x, hook_y - 0.06, 0.035)
                     .with_rotation(Quat::from_rotation_z(-0.06)),
             );
         }

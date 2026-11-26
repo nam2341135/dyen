@@ -186,8 +186,10 @@ fn window(commands: &mut Commands, meshes: &mut Assets<Mesh>, mats: &mut Assets<
         Transform::from_xyz(c.x, rod_y, 0.08)
             .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
     ));
-    let drape = meshes.add(Cuboid::new(0.17, 1.30, 0.02));
-    for (i, dx) in [-(hw + 0.07), hw + 0.07].into_iter().enumerate() {
+    // Rèm hẹp, phủ lên khung cửa sổ, để không che bảng ghi chú (trái) và kệ huy chương (phải)
+    // ở màn 360 px.
+    let drape = meshes.add(Cuboid::new(0.10, 1.30, 0.02));
+    for (i, dx) in [-hw, hw].into_iter().enumerate() {
         let pivot = commands
             .spawn((
                 Curtain {
