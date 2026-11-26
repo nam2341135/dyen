@@ -13,6 +13,7 @@ Vỏ trình duyệt tối thiểu (Leptos CSR, ADR 0008): danh mục hoạt đ�
 | Chuyển cảnh | `transition::Transition` | Máy trạng thái thuần của lớp phủ giữa phòng và khu (bản thiết kế phòng học 3D, mục 6.7): nhận `Ev`, trả `Effect` (đặt lớp phủ, đi tới màn, gửi phòng, hẹn giờ). Hẹn giờ mang `generation()`; đổi đích hoặc Back thì hẹn giờ cũ bị bỏ. |
 | Cầu nối phòng | `room` | `send` gọi JS `dyenToRoom`; `room3d` gọi `window.dyenFromRoom` → `dyen_from_room`. Lựa chọn "Phòng đơn giản" và chất lượng nằm trong `localStorage` (`dyen.simpleRoom`, `dyen.quality`). |
 | Màn phòng | `shell::Shell` | Nối hai thứ trên vào Leptos: nền phòng (ảnh chờ, canvas `#room3d`), danh sách khu, menu "⋯", lớp phủ. Không có `room3d` (hoặc lỗi, không WebGL2) thì danh sách chữ là lối vào, bấm chỉ còn lớp phủ mờ. |
+| Mục chặn | `Shell::guard`, `route::push_guard` | Mục lịch sử `#/` đẩy lúc lượt bay bắt đầu, vì hash khu chỉ đặt khi lớp phủ đã đục. Back của trình duyệt khi đang bay bỏ mục này (`popstate`) và huỷ lượt bay như Esc. Lớp phủ đục thì mục khu thay mục chặn (`location.replace`); Esc khi đang bay bỏ nó bằng `history.back()`. Màn đổi ngoài lượt bay (Forward, Back lần hai lúc đang về) thì vỏ tự cho phòng nghỉ hoặc thức (`shell::out_of_band`). |
 
 Nội dung `content/` được nhúng lúc biên dịch (`build.rs`) và dựng thành `content::Library` một lần (`library::get`).
 

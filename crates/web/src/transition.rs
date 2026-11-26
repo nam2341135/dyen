@@ -176,7 +176,8 @@ impl Transition {
     pub fn on(&mut self, ev: Ev) -> Vec<Effect> {
         use Phase::*;
         match (self.phase, ev) {
-            (Idle, Ev::Open(z)) => self.fly(z),
+            // Bấm vật khi đang về phòng vẫn bay: thế hệ mới bỏ hẹn giờ `Revealed` của lượt về.
+            (Idle | Leaving(_), Ev::Open(z)) => self.fly(z),
             (Flying(z), Ev::Open(z2)) if z2 != z => self.fly(z2),
             (Flying(z), Ev::CoverStart) => {
                 self.phase = Covering(z);
@@ -391,6 +392,29 @@ mod tests {
         run(&mut t, &[Ev::Open(Zone::Review), Ev::Back]);
         assert!(t.on(Ev::Back).is_empty());
         assert_eq!(t.phase, Phase::Leaving(Zone::Review));
+    }
+
+    #[test]
+    fn bam_vat_trong_luc_roi_khu_van_bay() {
+        let mut t = Transition::new(false);
+        run(
+            &mut t,
+            &[
+                Ev::Open(Zone::Review),
+                Ev::CoverStart,
+                Ev::Covered,
+                Ev::Back,
+            ],
+        );
+        assert_eq!(t.phase, Phase::Leaving(Zone::Review));
+        let g = t.generation();
+        let fx = t.on(Ev::Open(Zone::Contests));
+        assert_eq!(fx, vec![Effect::After(450, Ev::CoverStart)]);
+        assert_eq!(t.phase, Phase::Flying(Zone::Contests));
+        assert_ne!(t.generation(), g, "hẹn giờ Revealed của lượt về bị bỏ");
+        let fx = run(&mut t, &[Ev::CoverStart, Ev::Covered]);
+        assert!(fx.contains(&Effect::Navigate(Route::Contests)), "{fx:?}");
+        assert_eq!(t.phase, Phase::Waiting(Zone::Contests));
     }
 
     #[test]

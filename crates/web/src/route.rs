@@ -77,6 +77,31 @@ pub fn go(route: &Route) {
     }
 }
 
+/// Đẩy một mục lịch sử chặn `#/` (lúc bắt đầu lượt bay), để Back của trình duyệt huỷ lượt
+/// bay thay vì rời trang. `pushState` không phát `hashchange` hay `popstate`.
+pub fn push_guard() {
+    if let Some(h) = web_sys::window().and_then(|w| w.history().ok()) {
+        // Lỗi (không có trên trang thật) thì Back như cũ, bỏ qua.
+        let _ = h.push_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some("#/"));
+    }
+}
+
+/// Thay mục lịch sử hiện tại bằng màn `route` (vẫn phát `hashchange`).
+pub fn replace(route: &Route) {
+    if let Some(w) = web_sys::window() {
+        // Như `go`: lỗi không có gì để làm.
+        let _ = w.location().replace(&route.to_hash());
+    }
+}
+
+/// Lùi một mục lịch sử (`history.back()`), để bỏ mục chặn.
+pub fn back() {
+    if let Some(h) = web_sys::window().and_then(|w| w.history().ok()) {
+        // Như `go`: lỗi không có gì để làm.
+        let _ = h.back();
+    }
+}
+
 /// `location.hash` hiện tại ("" nếu không đọc được).
 pub fn current_hash() -> String {
     web_sys::window()

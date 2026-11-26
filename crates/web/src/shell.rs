@@ -82,6 +82,48 @@ pub fn canvas_hidden(simple: bool, three_d: ThreeD) -> bool {
     simple || three_d == ThreeD::Off
 }
 
+/// Có đẩy mục lịch sử chặn `#/` không, khi máy chuyển cảnh đi từ `before` sang `after`:
+/// chỉ khi lượt bay vừa bắt đầu (đổi đích giữa lượt bay thì không), vỏ đang ở phòng và chưa
+/// có mục chặn.
+pub fn needs_guard(before: Phase, after: Phase, at_room: bool, guard: bool) -> bool {
+    at_room && !guard && matches!(after, Phase::Flying(_)) && !matches!(before, Phase::Flying(_))
+}
+
+/// Cách thực hiện `Effect::Navigate`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NavMode {
+    /// Đặt hash, thêm một mục lịch sử (không có mục chặn).
+    Push,
+    /// Thay mục chặn bằng màn khu (lớp phủ đã đục).
+    Replace,
+    /// Về phòng khi đang bay (Esc): bỏ mục chặn bằng `history.back()`.
+    PopGuard,
+}
+
+/// Cách đi tới `to`, biết có mục chặn hay không.
+pub fn nav_mode(guard: bool, to: &Route) -> NavMode {
+    match (guard, to) {
+        (false, _) => NavMode::Push,
+        (true, Route::Room) => NavMode::PopGuard,
+        (true, _) => NavMode::Replace,
+    }
+}
+
+/// Thông điệp cho phòng khi màn đổi ngoài máy chuyển cảnh (Forward, Back lần hai lúc đang
+/// về): rời phòng mà không có lượt bay thì cho phòng nghỉ; về phòng thì đánh thức (trừ khi
+/// "Phòng đơn giản" bật). `phase` là pha lúc màn đổi.
+pub fn out_of_band(old: &Route, new: &Route, phase: Phase, simple: bool) -> Option<ToRoom> {
+    let was_room = *old == Route::Room;
+    let is_room = *new == Route::Room;
+    if was_room && !is_room && matches!(phase, Phase::Idle | Phase::Leaving(_)) {
+        Some(ToRoom::Suspend)
+    } else if is_room && !was_room && !simple {
+        Some(ToRoom::Resume)
+    } else {
+        None
+    }
+}
+
 /// Trạng thái của màn phòng (toàn signal, nên `Copy`): máy chuyển cảnh, lớp phủ, phòng 3D
 /// và các lựa chọn của người dùng.
 #[derive(Clone, Copy)]
@@ -95,6 +137,12 @@ pub struct Shell {
     menu_open: RwSignal<bool>,
     /// Đã gọi `dyenRoom.load` (chỉ gọi một lần mỗi trang).
     loaded: StoredValue<bool>,
+    /// Vỏ đang hiện màn phòng (cập nhật ở [`Shell::route_changed`]).
+    at_room: StoredValue<bool>,
+    /// Đã đẩy mục lịch sử chặn `#/` cho lượt bay hiện tại.
+    guard: StoredValue<bool>,
+    /// Số `popstate` do chính vỏ gây ra (`history.back()` bỏ mục chặn) còn chờ, phải bỏ qua.
+    own_pops: StoredValue<u32>,
 }
 
 impl Shell {
@@ -110,6 +158,9 @@ impl Shell {
             quality: RwSignal::new(room::current_quality()),
             menu_open: RwSignal::new(false),
             loaded: StoredValue::new(false),
+            at_room: StoredValue::new(false),
+            guard: StoredValue::new(false),
+            own_pops: StoredValue::new(0),
         }
     }
 
@@ -120,7 +171,19 @@ impl Shell {
 
     /// Đưa một sự kiện vào máy chuyển cảnh và làm các việc nó trả về.
     pub fn fire(self, ev: Ev) {
+        let before = self.tr.with_untracked(|t| t.phase);
         let fx = self.tr.try_update(|t| t.on(ev)).unwrap_or_default();
+        let after = self.tr.with_untracked(|t| t.phase);
+        if needs_guard(
+            before,
+            after,
+            self.at_room.get_value(),
+            self.guard.get_value(),
+        ) {
+            // Back của trình duyệt khi đang bay sẽ bỏ mục này (`popstate`), không rời trang.
+            route::push_guard();
+            self.guard.set_value(true);
+        }
         for e in fx {
             self.run(e);
         }
@@ -134,7 +197,20 @@ impl Shell {
                 }
                 self.overlay.set(o);
             }
-            Effect::Navigate(r) => route::go(&r),
+            Effect::Navigate(r) => {
+                let mode = nav_mode(self.guard.get_value(), &r);
+                self.guard.set_value(false);
+                match mode {
+                    NavMode::Push => route::go(&r),
+                    // Mục khu thay mục chặn: lịch sử như khi không có mục chặn.
+                    NavMode::Replace => route::replace(&r),
+                    // Esc khi đang bay: hash đã là `#/`, chỉ bỏ mục chặn.
+                    NavMode::PopGuard => {
+                        self.own_pops.update_value(|n| *n += 1);
+                        route::back();
+                    }
+                }
+            }
             // "Phòng đơn giản" đang bật: phòng đã dừng, giữ dừng.
             Effect::Send(ToRoom::Resume) if self.simple.get_untracked() => {}
             Effect::Send(m) => room::send(&m),
@@ -193,12 +269,22 @@ impl Shell {
 
     /// Màn đã đổi (sau `hashchange`, hoặc lúc mở trang với `old == new`).
     pub fn route_changed(self, old: &Route, new: &Route) {
+        self.at_room.set_value(*new == Route::Room);
+        let oob = out_of_band(
+            old,
+            new,
+            self.tr.with_untracked(|t| t.phase),
+            self.simple.get_untracked(),
+        );
         if *new == Route::Room {
             if *old != Route::Room {
                 // Back của trình duyệt, nút "←", "Về phòng": cùng một đường về.
                 self.fire(Ev::Back);
             }
             self.ensure_loaded();
+        }
+        if let Some(m) = oob {
+            room::send(&m);
         }
         request_animation_frame(move || self.fire(Ev::PageReady));
     }
@@ -231,6 +317,18 @@ impl Shell {
                 if r != Route::Room {
                     route::go(&r.up());
                 }
+            }
+        });
+        // Back của trình duyệt khi đang bay bỏ mục chặn: huỷ lượt bay. Các `popstate` khác
+        // (Back/Forward giữa các hash) đã có `hashchange` lo.
+        _ = window_event_listener(leptos::ev::popstate, move |_| {
+            if self.own_pops.get_value() > 0 {
+                self.own_pops.update_value(|n| *n -= 1);
+                return;
+            }
+            if self.guard.get_value() {
+                self.guard.set_value(false);
+                self.fire(Ev::Back);
             }
         });
         // Gộp đổi cỡ: tối đa một `Resize` mỗi 200 ms, gửi kích thước sau cùng.
@@ -428,6 +526,66 @@ mod tests {
         assert_eq!(v.label, None);
         let v = shell_view(v, &FromRoom::Open(Zone::Review));
         assert_eq!(v.three_d, ThreeD::Ready);
+    }
+
+    #[test]
+    fn chi_chan_back_khi_luot_bay_bat_dau_o_phong() {
+        let r = Phase::Flying(Zone::Review);
+        let c = Phase::Flying(Zone::Contests);
+        assert!(needs_guard(Phase::Idle, r, true, false));
+        // Bấm vật khi đang về phòng cũng là lượt bay mới.
+        assert!(needs_guard(Phase::Leaving(Zone::Review), c, true, false));
+        // Đổi đích giữa lượt bay: đã có mục chặn của lượt này.
+        assert!(!needs_guard(r, c, true, false));
+        assert!(!needs_guard(Phase::Idle, r, true, true));
+        // Không ở phòng: không đẩy `#/` đè lên màn khu.
+        assert!(!needs_guard(Phase::Idle, r, false, false));
+        // Không bắt đầu bay.
+        assert!(!needs_guard(r, Phase::Covering(Zone::Review), true, false));
+        assert!(!needs_guard(Phase::Idle, Phase::Idle, true, false));
+    }
+
+    #[test]
+    fn co_muc_chan_thi_thay_hoac_bo_muc_chan() {
+        assert_eq!(nav_mode(false, &Route::Review), NavMode::Push);
+        assert_eq!(nav_mode(false, &Route::Room), NavMode::Push);
+        assert_eq!(nav_mode(true, &Route::Contests), NavMode::Replace);
+        assert_eq!(nav_mode(true, &Route::Room), NavMode::PopGuard);
+    }
+
+    #[test]
+    fn doi_man_ngoai_luot_bay_thi_phong_nghi_hoac_thuc() {
+        let z = Zone::Review;
+        // Forward từ phòng tới khu, hoặc Back lần hai lúc đang về: phòng nghỉ.
+        for p in [Phase::Idle, Phase::Leaving(z)] {
+            assert_eq!(
+                out_of_band(&Route::Room, &Route::Review, p, false),
+                Some(ToRoom::Suspend),
+                "{p:?}"
+            );
+        }
+        // Vào khu theo lượt bay: `Revealed` mới cho phòng nghỉ.
+        for p in [Phase::Waiting(z), Phase::Revealing(z)] {
+            assert_eq!(out_of_band(&Route::Room, &Route::Review, p, false), None);
+        }
+        // Về phòng: đánh thức, trừ khi "Phòng đơn giản" bật.
+        assert_eq!(
+            out_of_band(&Route::Contests, &Route::Room, Phase::Idle, false),
+            Some(ToRoom::Resume)
+        );
+        assert_eq!(
+            out_of_band(&Route::Contests, &Route::Room, Phase::Idle, true),
+            None
+        );
+        // Đổi giữa hai màn khu, hay không đổi: không gì.
+        assert_eq!(
+            out_of_band(&Route::Review, &Route::Contests, Phase::Idle, false),
+            None
+        );
+        assert_eq!(
+            out_of_band(&Route::Room, &Route::Room, Phase::Idle, false),
+            None
+        );
     }
 
     #[test]
