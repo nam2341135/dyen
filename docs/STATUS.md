@@ -45,6 +45,12 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
   Đã thử ở 360 px, sáng và tối. Còn: người duyệt giao diện; chấp nhận ADR 0015; merge sau PR #10.
 
+- **Trang chủ là phòng học 3D, mốc 1 (phòng + điều hướng).** Nhánh `docs/phong-hoc-3d`, chưa commit. Đã xong:
+  - bản thiết kế, đã được chủ dự án duyệt: [`docs/superpowers/specs/2026-11-27-phong-hoc-3d-design.md`](superpowers/specs/2026-11-27-phong-hoc-3d-design.md);
+  - kế hoạch 8 task: [`docs/superpowers/plans/2026-11-27-phong-hoc-3d.md`](superpowers/plans/2026-11-27-phong-hoc-3d.md).
+
+  Còn: chủ dự án duyệt kế hoạch và chọn cách thực hiện; rồi làm từ Task 1 trên nhánh `feat/phong-hoc-3d`. Task 7 phải hỏi trước khi tải mô hình CC0.
+
 ## Chờ người quyết
 
 Việc AI không tự làm được hoặc không được tự quyết.
