@@ -45,7 +45,7 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
 
   Đã thử ở 360 px, sáng và tối. Còn: người duyệt giao diện; chấp nhận ADR 0015; merge sau PR #10.
 
-- **Trang chủ là phòng học 3D, mốc 1 (phòng + điều hướng).** Nhánh `feat/phong-hoc-3d`, đã commit đủ 8 task, chưa có PR (bản nháp mô tả PR đã viết, chờ chủ dự án cho mở). Thiết kế: [`docs/superpowers/specs/2026-11-27-phong-hoc-3d-design.md`](superpowers/specs/2026-11-27-phong-hoc-3d-design.md); kế hoạch: [`docs/superpowers/plans/2026-11-27-phong-hoc-3d.md`](superpowers/plans/2026-11-27-phong-hoc-3d.md). Đã xong:
+- **Trang chủ là phòng học 3D, mốc 1 (phòng + điều hướng).** Nhánh `feat/phong-hoc-3d`, đã commit đủ 8 task, PR #12, xếp chồng lên PR #11. Thiết kế: [`docs/superpowers/specs/2026-11-27-phong-hoc-3d-design.md`](superpowers/specs/2026-11-27-phong-hoc-3d-design.md); kế hoạch: [`docs/superpowers/plans/2026-11-27-phong-hoc-3d.md`](superpowers/plans/2026-11-27-phong-hoc-3d.md). Đã xong:
   - crate thuần `room-model` (bảng `ROOM`, giao thức `ToRoom`/`FromRoom`);
   - vỏ web: định tuyến hash, danh sách chữ các khu, lớp phủ chuyển cảnh, menu "⋯" ("Phòng đơn giản", chất lượng);
   - `room3d` (Bevy): cảnh, mô hình CC0 (nguồn ở `crates/room3d/assets/NGUON.md`), trời theo giờ, mèo, bay camera, tự hạ chất lượng;
