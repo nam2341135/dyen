@@ -26,6 +26,10 @@ python -m http.server -d crates/web/dist 8091
 
 Test đơn vị chạy trên máy chủ như mọi crate: `cargo test -p web`.
 
+## Bản trên mạng
+
+<https://nam2341135.github.io/dyen/app/> — workflow `.github/workflows/pages.yml` build lại sau mỗi lần đẩy lên `main` và chỉ thay thư mục `app/` của nhánh `gh-pages`. GitHub Pages chỉ nén gzip (không brotli), nên lượng tải thật lớn hơn số brotli dưới đây.
+
 ## Kích thước đo được (2026-11-26)
 
 | | Byte |
