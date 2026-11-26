@@ -18,13 +18,13 @@ Mỗi mục: nhánh / PR, đã xong gì, còn gì, lệnh tiếp theo.
   - `cargo xtask docs` trong `ci`;
   - mẫu PR.
 
-  CI xanh, PR đang mở (xếp chồng lên PR #4). Còn: người duyệt và merge, sau PR #4.
+  CI xanh, PR #5 đang mở (xếp chồng lên PR #4). Còn: người duyệt và merge, sau PR #4.
 
 ## Chờ người quyết
 
 Việc AI không tự làm được hoặc không được tự quyết.
 
-- Duyệt và merge PR cấu trúc bàn giao (nhánh `docs/handoff`), sau PR #4.
+- Duyệt và merge PR #5 (cấu trúc bàn giao), sau PR #4.
 - Duyệt và merge PR #4, rồi thử vỏ web trên iPhone thật: vùng bấm, nút 44 px.
 - Đo thời gian tải trên một điện thoại Android tầm trung. Đây là nợ từ spike ADR 0008; mới đo iPhone 12.
 - ADR 0005: phần pháp lý (luật Việt Nam về dữ liệu trẻ em) chưa xác minh với người có chuyên môn.
